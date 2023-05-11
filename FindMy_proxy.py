@@ -31,11 +31,18 @@ class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
         print('Getting with post: ' + str(post_body))
         UTCTime, Timezone, unixEpoch = getCurrentTimes()
         body = json.loads(post_body)
+        # TODO: this is where I can implement minutes
+        # if "minutes" in body:
+        #     minutes = body['minutes']
         if "days" in body:
             days = body['days']
+        # if 'days' and 'minutes' are absent then do this:
         else: 
             days = 7
+        # setup messages for days and minutes. A Function probably.
         print('Querying for ' + str(days) + ' days')
+        # this will need to be updated for days + minutes = seconds
+        # make sure that a negative number will yield the expected result (see line 85)
         startdate = (unixEpoch - 60 * 60 * 24 * days) * 1000
         data = '{"search": [{"ids": [\"%s\"]}]}' % ( "\",\"".join(body['ids']))
 

@@ -25,6 +25,7 @@ if __name__ == "__main__":
     isV3 = sys.version_info.major > 2
     print('Using python3' if isV3 else 'Using python2')
     parser = argparse.ArgumentParser()
+    # add an argument for minutes
     parser.add_argument(
         '-d', '--days', help='only show reports not older than these days', type=int, default=TIME_FRAME)
     parser.add_argument(
