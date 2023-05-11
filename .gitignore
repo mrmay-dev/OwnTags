@@ -123,3 +123,11 @@ openssl/release
 notes
 **/osx-serial-generator
 *.pyc
+
+venv/
+
+firmware/
+
+required.sh
+
+update.sh
