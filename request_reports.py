@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3
 
 import argparse
 import json
@@ -6,14 +6,18 @@ import ssl
 
 from apple_cryptography import *
 
+from mysecrets import owntag_options
 OUTPUT_FOLDER = 'output/'
+TIME_FRAME = owntag_options["time_frame"]
+
+print(f'{datetime.datetime.now().replace(microsecond=0).isoformat()}')
 
 if __name__ == "__main__":
     isV3 = sys.version_info.major > 2
     print('Using python3' if isV3 else 'Using python2')
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-H', '--hours', help='only show reports not older than these hours', type=int, default=TIME_FRAME)
+        '-m', '--minutes', help='only show reports not older than these hours', type=int, default=TIME_FRAME)
     parser.add_argument(
         '-p', '--prefix', help='only use keyfiles starting with this prefix', default='')
     parser.add_argument(
@@ -61,8 +65,8 @@ if __name__ == "__main__":
                     ids[hashed_adv] = priv
                     names[hashed_adv] = name
 
-    startdate = unixEpoch - 60 * 60 * args.hours
-    startdate = unixEpoch - 60 * 60 * args.hours
+    minutes = 60 * args.minutes
+    startdate = unixEpoch - minutes
 
     keys = '","'.join(ids.keys())
 
@@ -107,6 +111,22 @@ if __name__ == "__main__":
             ordered.append(res)
 
     ordered.sort(key=lambda item: item.get('timestamp'))
-    for rep in ordered: print(rep)
-    print('found:   ', list(found))
-    print('missing: ', [key for key in names.keys() if key not in found])
+
+    found = list(found)
+    missing = list(prefixes)
+    for each in found:
+        missing.remove(each)
+
+    print(f'{len(ordered)} reports used.')
+    print(f'list all: {prefixes}\nmissing: {missing}\nfound: {found}')
+    exit()
+
+    if args.owntracks:
+        import OwnTracks_client
+        ordered = OwnTracks_client.owntracks(ordered, args.minutes, args.prefix, prefixes, found, missing)
+
+    if ordered is not None:
+        print(f'\n{"looked for:":<14}{prefixes}')
+        print(f'{"missing keys:":<14}{missing}')
+        print(f'{"found:":<14}{list(found)}')
+        print(json.dumps(ordered, indent=4))  # use `separators=(',', ':')` for minimized output
