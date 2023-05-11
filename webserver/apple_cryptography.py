@@ -1,5 +1,4 @@
-#!/usr/bin/env python 
-
+#!/usr/bin/env python
 
 import os,glob
 import datetime, time
@@ -12,6 +11,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.padding import PKCS7
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import ec
 import objc, six, sys
 from Foundation import NSBundle, NSClassFromString, NSData, NSPropertyListSerialization
 
@@ -26,14 +26,17 @@ def sha256(data):
     digest.update(data)
     return digest.digest()
 
+
 def decrypt(enc_data, algorithm_dkey, mode):
     decryptor = Cipher(algorithm_dkey, mode, default_backend()).decryptor()
     return decryptor.update(enc_data) + decryptor.finalize()
+
 
 def unpad(paddedBinary, blocksize):
     unpadder = PKCS7(blocksize).unpadder()
     # print(unpadder.finalize())
     return unpadder.update(paddedBinary) + unpadder.finalize()
+
 
 def decode_tag(data):
     latitude = struct.unpack(">i", data[0:4])[0] / 10000000.0
@@ -41,6 +44,7 @@ def decode_tag(data):
     confidence = bytes_to_int(data[8:9])
     status = bytes_to_int(data[9:10])
     return {'lat': latitude, 'lon': longitude, 'conf': confidence, 'status':status}
+
 
 def retrieveICloudKey():
     global password
@@ -53,7 +57,6 @@ def retrieveICloudKey():
     symmetric_key = unpad(decrypt(p1[:32][::-1], algorithms.TripleDES(db_key), modes.CBC(symmetric_key_IV)), algorithms.TripleDES.block_size)[4:]
     icloud_key = unpad(decrypt(icloud_key_enc, algorithms.TripleDES(symmetric_key), modes.CBC(icloud_key_IV)), algorithms.TripleDES.block_size)
     return icloud_key
-
 
 
 def readKeychain():
@@ -121,12 +124,14 @@ def getAppleDSIDandSearchPartyToken(iCloudKey):
     tokenPlist = NSPropertyListSerialization.propertyListWithData_options_format_error_(binToPlist, 0, None, None)[0]
     return tokenPlist["appleAccountInfo"]["dsPrsID"], tokenPlist["tokens"]['searchPartyToken']
 
+
 def getOTPHeaders():
     AOSKitBundle = NSBundle.bundleWithPath_('/System/Library/PrivateFrameworks/AOSKit.framework')
     objc.loadBundleFunctions(AOSKitBundle, globals(), [("retrieveOTPHeadersForDSID", b'')])
     util = NSClassFromString('AOSUtilities')
     anisette = str(util.retrieveOTPHeadersForDSID_("-2")).replace('"', ' ').replace(';', ' ').split()
     return anisette[6], anisette[3]
+
 
 def getCurrentTimes():
     clientTime = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
