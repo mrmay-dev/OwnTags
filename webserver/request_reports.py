@@ -1,45 +1,55 @@
 #!/usr/bin/env python 
 
-import argparse, json, ssl
+import argparse
+import json
+import ssl
 
 from apple_cryptography import *
 
 OUTPUT_FOLDER = 'output/'
 
 if __name__ == "__main__":
-    isV3 =  sys.version_info.major > 2
+    isV3 = sys.version_info.major > 2
     print('Using python3' if isV3 else 'Using python2')
     parser = argparse.ArgumentParser()
-    parser.add_argument('-H', '--hours', help='only show reports not older than these hours', type=int, default=24)
-    parser.add_argument('-p', '--prefix', help='only use keyfiles starting with this prefix', default='')
-    parser.add_argument('-k', '--key', help="iCloud decryption key ($ security find-generic-password -ws 'iCloud')")
+    parser.add_argument(
+        '-H', '--hours', help='only show reports not older than these hours', type=int, default=TIME_FRAME)
+    parser.add_argument(
+        '-p', '--prefix', help='only use keyfiles starting with this prefix', default='')
+    parser.add_argument(
+        '-k', '--key', help="iCloud decryption key ($ security find-generic-password -ws 'iCloud')")
+    parser.add_argument(
+        '-o', '--owntracks', help="Enable experimental OwnTracks integration", action='store_true')
     args = parser.parse_args()
     iCloud_decryptionkey = args.key if args.key else retrieveICloudKey()
 
-    AppleDSID,searchPartyToken = getAppleDSIDandSearchPartyToken(iCloud_decryptionkey)
+    AppleDSID, searchPartyToken = getAppleDSIDandSearchPartyToken(iCloud_decryptionkey)
     machineID, oneTimePassword = getOTPHeaders()
     UTCTime, Timezone, unixEpoch = getCurrentTimes()
 
     request_headers = {
-        'Authorization': "Basic %s" % (base64.b64encode((AppleDSID + ':' + searchPartyToken).encode('ascii')).decode('ascii')),
-        'X-Apple-I-MD': "%s" % (oneTimePassword),
+        'Authorization': "Basic %s" % (
+            base64.b64encode((AppleDSID + ':' + searchPartyToken).encode('ascii')).decode('ascii')),
+        'X-Apple-I-MD': "%s" % oneTimePassword,
         'X-Apple-I-MD-RINFO': '17106176',
-        'X-Apple-I-MD-M': "%s" % (machineID) ,
-        'X-Apple-I-TimeZone': "%s" % (Timezone),
-        'X-Apple-I-Client-Time': "%s" % (UTCTime),
+        'X-Apple-I-MD-M': "%s" % machineID,
+        'X-Apple-I-TimeZone': "%s" % Timezone,
+        'X-Apple-I-Client-Time': "%s" % UTCTime,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'X-BA-CLIENT-TIMESTAMP': "%s" % (unixEpoch)
+        'X-BA-CLIENT-TIMESTAMP': "%s" % unixEpoch
     }
 
     ids = {}
     names = {}
-    for keyfile in glob.glob(OUTPUT_FOLDER  + args.prefix+'*.keys'):
+    prefixes = []
+    for keyfile in glob.glob(OUTPUT_FOLDER + args.prefix + '*.keys'):
         # read key files generated with generate_keys.py
         with open(keyfile) as f:
             hashed_adv = ''
             priv = ''
-            name = keyfile[len(args.prefix):-5]
+            name = keyfile[len(OUTPUT_FOLDER):-5]
+            prefixes.append(name)
             for line in f:
                 key = line.rstrip('\n').split(': ')
                 if key[0] == 'Private key':
@@ -56,16 +66,19 @@ if __name__ == "__main__":
 
     keys = '","'.join(ids.keys())
 
-    data = '{"search": [{"endDate": %d, "startDate": %d, "ids":["%s"]}]}' % ((unixEpoch -978307200) *1000000, (startdate -978307200)*1000000, keys)
-    print(data)
-    
-    conn = six.moves.http_client.HTTPSConnection('gateway.icloud.com', timeout=5, context=ssl._create_unverified_context())
-    
+    data = '{"search": [{"endDate": %d, "startDate": %d, "ids":["%s"]}]}' % (
+        (unixEpoch - 978307200) * 1000000, (startdate - 978307200) * 1000000, keys)
+    # print(data)
+
+    conn = six.moves.http_client.HTTPSConnection(
+        'gateway.icloud.com', timeout=5, context=ssl._create_unverified_context())
+
     conn.request("POST", "/acsnservice/fetch", data, request_headers)
     response = conn.getresponse()
     print(response.status, response.reason)
     res = json.loads(response.read())['results']
-    print('%d reports received.' % len(res))
+    print('\n%d reports received.' % len(res))
+    # print(res)
 
     ordered = []
     found = set()
@@ -92,8 +105,7 @@ if __name__ == "__main__":
             res['goog'] = 'https://maps.google.com/maps?q=' + str(res['lat']) + ',' + str(res['lon'])
             found.add(res['key'])
             ordered.append(res)
-    
-    print('%d reports used.' % len(ordered))
+
     ordered.sort(key=lambda item: item.get('timestamp'))
     for rep in ordered: print(rep)
     print('found:   ', list(found))
