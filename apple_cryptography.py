@@ -15,7 +15,8 @@ from cryptography.hazmat.primitives.asymmetric import ec
 import objc, six, sys
 from Foundation import NSBundle, NSClassFromString, NSData, NSPropertyListSerialization
 
-password = '' # Keychain password, can be hardcoded
+from output.mysecrets import secrets
+password = secrets["password"]  # Keychain password, can be hardcoded
 
 
 def bytes_to_int(b):
