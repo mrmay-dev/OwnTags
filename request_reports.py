@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 
+# This script fetches OpenHaystack reports and prints them to the console
+# or serves them OwnTags_plugin.py for processing.
+
 import argparse
 import json
 import ssl
 
 from apple_cryptography import *
 
-from mysecrets import owntag_options
+from output.mysecrets import owntag_options
 OUTPUT_FOLDER = 'output/'
 TIME_FRAME = owntag_options["time_frame"]
 
@@ -119,11 +122,10 @@ if __name__ == "__main__":
 
     print(f'{len(ordered)} reports used.')
     print(f'list all: {prefixes}\nmissing: {missing}\nfound: {found}')
-    exit()
 
     if args.owntracks:
-        import OwnTracks_client
-        ordered = OwnTracks_client.owntracks(ordered, args.minutes, args.prefix, prefixes, found, missing)
+        import OwnTags_plugin
+        ordered = OwnTags_plugin.owntags(ordered, args.minutes, args.prefix, prefixes, found, missing)
 
     if ordered is not None:
         print(f'\n{"looked for:":<14}{prefixes}')
