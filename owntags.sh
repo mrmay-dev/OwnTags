@@ -12,6 +12,7 @@ source "$VENV_DIR/bin/activate"
 wait
 
 cd "$SCRIPT_DIR"
-python3 request_reports.py --prefix $1 --owntracks
+# time should be entered as hh:mm if hardcoded here
+python3 FindMy_client.py --time $1 --owntags
 echo "-- End Script --"
 echo
