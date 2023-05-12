@@ -10,6 +10,7 @@
 import requests
 import argparse
 import json
+import re
 
 from apple_cryptography import *
 
@@ -17,7 +18,6 @@ from output.mysecrets import owntag_options
 OUTPUT_FOLDER = 'output/'
 # TODO: add a minutes time_frame. This will require tweaking the `FindMy_proxy`.
 # TIME_FRAME = owntag_options["time_frame"]
-TIME_FRAME = 1
 
 print(f'{datetime.datetime.now().replace(microsecond=0).isoformat()}')
 
@@ -25,9 +25,10 @@ if __name__ == "__main__":
     isV3 = sys.version_info.major > 2
     print('Using python3' if isV3 else 'Using python2')
     parser = argparse.ArgumentParser()
-    # add an argument for minutes
     parser.add_argument(
-        '-d', '--days', help='only show reports not older than these days', type=int, default=TIME_FRAME)
+        '-t', '--time', help='only show reports less than hh:mm (hours:minutes) old', default='00:00')
+    parser.add_argument(
+        '-d', '--days', help='only show reports less than these days.', type=int, default=0)
     parser.add_argument(
         '-p', '--prefix', help='only use keyfiles starting with this prefix', default='')
     parser.add_argument(
@@ -35,6 +36,14 @@ if __name__ == "__main__":
     parser.add_argument(
         '-o', '--owntags', help="Enable experimental OwnTracks integration", action='store_true')
     args = parser.parse_args()
+
+    pattern = re.compile("\d{1,2}:\d{2}")
+    if not pattern.match(args.time):
+        raise ValueError('Time not formatted as hh:mm.')
+    else:
+        hours_minutes = (args.time).split(":")
+        hours = int(hours_minutes[0])
+        minutes = int(hours_minutes[1])
 
     iCloud_decryptionkey = args.key if args.key else retrieveICloudKey()
     # iCloud_decryptionkey = retrieveICloudKey()
@@ -62,16 +71,18 @@ if __name__ == "__main__":
                 if priv and hashed_adv:
                     ids[hashed_adv] = priv
                     names[hashed_adv] = name
-    
+
     # Create JSON list of keys
     keys = '","'.join(ids.keys())
     keys = json.loads(f'["{keys}"]')
-    
-    # Create JSON payload
-    # TODO: make this minutes instead of days
-    payload = {"days": args.days, "ids": keys}
+
+    # time in seconds
+    time_seconds = ((args.days * 24 * 60) + (hours * 60) + minutes) * 60
+
+    payload = {"days": time_seconds, "ids": keys}
     print(f'\nPayload:\n{json.dumps(payload, indent=4)}')
     if payload["ids"][0] == "":
+        # catching an error when user enters unlisted prefix
         raise ValueError('The key prefix requested cannot be found.')
     
     # Request reports from the server
@@ -123,7 +134,7 @@ if __name__ == "__main__":
     # send reports to the owntags plugin
     if args.owntags:
         import OwnTags_plugin
-        ordered = OwnTags_plugin.owntags(ordered, args.minutes, found, prefixes, missing)
+        ordered = OwnTags_plugin.owntags(ordered, time_seconds, found, prefixes, missing)
     
     # print results summary
     print(f'{"looked for:":<14}{prefixes}')  

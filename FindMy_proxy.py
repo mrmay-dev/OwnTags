@@ -8,7 +8,6 @@ import sys
 
 from apple_cryptography import *
 
-
 PORT = 6176
 
 class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -31,19 +30,16 @@ class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
         print('Getting with post: ' + str(post_body))
         UTCTime, Timezone, unixEpoch = getCurrentTimes()
         body = json.loads(post_body)
-        # TODO: this is where I can implement minutes
-        # if "minutes" in body:
-        #     minutes = body['minutes']
-        if "days" in body:
+        # TODO: This is SECONDS
+        if "days" in body:  # keeping 'days' to preserve API original language
             days = body['days']
-        # if 'days' and 'minutes' are absent then do this:
         else: 
-            days = 7
-        # setup messages for days and minutes. A Function probably.
-        print('Querying for ' + str(days) + ' days')
-        # this will need to be updated for days + minutes = seconds
-        # make sure that a negative number will yield the expected result (see line 85)
-        startdate = (unixEpoch - 60 * 60 * 24 * days) * 1000
+            days = 7 * 86400  # query for seven days if 'days' key is not present
+
+        print('Querying for ' + str(round(days/86400, 2)) + ' days'
+              + f' (or {round(days/60, 2)} minutes, or {days} seconds)')
+        startdate = (unixEpoch - days) * 1000
+
         data = '{"search": [{"ids": [\"%s\"]}]}' % ( "\",\"".join(body['ids']))
 
         iCloud_decryptionkey = retrieveICloudKey()
@@ -68,8 +64,8 @@ class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
         conn.request("POST", "/acsnservice/fetch", data, request_headers)
         res = conn.getresponse()
         result = json.loads(res.read())
-
         results = result["results"]
+        print(f'{len(results)} results received.')
 
         newResults = [] 
         latestEntry = None

@@ -4,8 +4,8 @@
 import json
 import datetime
 import paho.mqtt.publish as publish
-from mysecrets import owntag_options
-from mysecrets import mqtt_secrets
+from output.mysecrets import owntag_options
+from output.mysecrets import mqtt_secrets
 
 
 def owntags(ordered, args_minutes, found_keys, prefixes, missing):
@@ -135,7 +135,7 @@ def owntags(ordered, args_minutes, found_keys, prefixes, missing):
             "creation_stamp": creation_stamp,
             "status_topic": status_topic,
             "check_time": check_time,
-            "report_minutes": args_minutes,
+            "report_minutes": round(args_minutes/60,2),
             "reports_count": len(key_list),
             "last_report": key_list  # (this is actually the list of locations)
         }
