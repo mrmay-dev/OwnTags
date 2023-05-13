@@ -13,7 +13,6 @@ from apple_cryptography import *
 from output.mysecrets import owntag_options
 
 OUTPUT_FOLDER = 'output/'
-TIME_FRAME = owntag_options["time_frame"]
 
 print(f'{datetime.datetime.now().replace(microsecond=0).isoformat()}')
 
