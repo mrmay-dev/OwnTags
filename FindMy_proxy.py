@@ -30,15 +30,15 @@ class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
         print('Getting with post: ' + str(post_body))
         UTCTime, Timezone, unixEpoch = getCurrentTimes()
         body = json.loads(post_body)
-        # TODO: This is SECONDS
-        if "days" in body:  # keeping 'days' to preserve API original language
-            days = body['days']
+        # CHANGED: days to seconds. Simpler API
+        if "seconds" in body:  # keeping 'days' to preserve API original language
+            seconds = body['seconds']
         else: 
-            days = 7 * 86400  # query for seven days if 'days' key is not present
+            seconds = 7 * 86400  # query for seven days if 'seconds' key is not present
 
-        print('Querying for ' + str(round(days/86400, 2)) + ' days'
-              + f' (or {round(days/60, 2)} minutes, or {days} seconds)')
-        startdate = (unixEpoch - days) * 1000
+        print('Querying for ' + str(round(seconds/86400, 2)) + ' days'
+              + f' (or {round(seconds/60, 2)} minutes, or {seconds} seconds)')
+        startdate = (unixEpoch - seconds) * 1000
 
         data = '{"search": [{"ids": [\"%s\"]}]}' % ( "\",\"".join(body['ids']))
 
@@ -78,7 +78,7 @@ class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
             elif latestEntry["datePublished"] < entry["datePublished"]:
                 latestEntry = entry
 
-        if days < 1 and latestEntry is not None:
+        if seconds < 1 and latestEntry is not None:
             newResults.append(latestEntry)         
         result["results"] = newResults
         self.send_response(200)
