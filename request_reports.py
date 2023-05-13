@@ -6,10 +6,12 @@
 import argparse
 import json
 import ssl
+import re
 
 from apple_cryptography import *
 
 from output.mysecrets import owntag_options
+
 OUTPUT_FOLDER = 'output/'
 TIME_FRAME = owntag_options["time_frame"]
 
@@ -96,7 +98,10 @@ if __name__ == "__main__":
 
     conn.request("POST", "/acsnservice/fetch", data, request_headers)
     response = conn.getresponse()
-    print(response.status, response.reason)
+    response_status = (response.status, response.reason)
+    print(response_status[0], response_status[1])
+    if response.status == 500:
+        raise Exception(response_status)
     res = json.loads(response.read())['results']
     print('\n%d reports received.' % len(res))
     # print(res)
@@ -133,16 +138,25 @@ if __name__ == "__main__":
     missing = list(prefixes)
     for each in found:
         missing.remove(each)
+    reports_used = len(ordered)
+    print(f'{reports_used} reports used.')
+    # print(f'list all: {prefixes}\nmissing: {missing}\nfound: {found}')
 
-    print(f'{len(ordered)} reports used.')
-    print(f'list all: {prefixes}\nmissing: {missing}\nfound: {found}')
-
-    if args.owntracks:
+    if args.tinydb and len(ordered) > 0:
+        from tinydb import TinyDB
+        # 2023-05-12T2215_Fri %Y-%m-%dT%H%M_a%
+        today_is = '{:%Y-%m-%d_%a}'.format(datetime.datetime.now())
+        db = TinyDB(f'./output/tinydb/{today_is}.json')
+        for each in ordered:
+            db.insert(each)
+        print(f'{reports_used} reports written to file.')
+        
+    if args.owntags:
         import OwnTags_plugin
-        ordered = OwnTags_plugin.owntags(ordered, args.minutes, args.prefix, prefixes, found, missing)
+        ordered = OwnTags_plugin.owntags(ordered, time_window, found)
 
-    if ordered is not None:
-        print(f'\n{"looked for:":<14}{prefixes}')
-        print(f'{"missing keys:":<14}{missing}')
-        print(f'{"found:":<14}{list(found)}')
+    print(f'\n{"looked for:":<14}{prefixes}')
+    print(f'{"missing keys:":<14}{missing}')
+    print(f'{"found:":<14}{list(found)}')
+    if len(ordered) > 0:
         print(json.dumps(ordered, indent=4))  # use `separators=(',', ':')` for minimized output
