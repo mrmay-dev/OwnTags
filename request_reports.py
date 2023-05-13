@@ -10,8 +10,6 @@ import re
 
 from apple_cryptography import *
 
-from output.mysecrets import owntag_options
-
 OUTPUT_FOLDER = 'output/'
 
 print(f'{datetime.datetime.now().replace(microsecond=0).isoformat()}')
@@ -30,7 +28,7 @@ if __name__ == "__main__":
         '-k', '--key', help="iCloud decryption key ($ security find-generic-password -ws 'iCloud')")
     parser.add_argument(
         '-o', '--owntags', help="Enable experimental OwnTracks integration", action='store_true')
-    parser.add_argument(
+    parser.add_argument(  # will change to use FluxDB small time-series database
         '-b', '--tinydb', help="add reports to TinyDB database", action='store_true')
     args = parser.parse_args()
 

@@ -13,9 +13,12 @@ wait
 
 cd "$SCRIPT_DIR"
 # time should be entered as hh:mm if hardcoded here
+
 # use this to run the proxy/client method
 # python3 FindMy_client.py --time $1 --owntags
+
 # use this for the standalone method
 python3 request_reports.py --time $1 --owntags --tinydb
+
 echo "-- End Script --"
 echo

@@ -14,10 +14,7 @@ import re
 
 from apple_cryptography import *
 
-from output.mysecrets import owntag_options
 OUTPUT_FOLDER = 'output/'
-# TODO: add a minutes time_frame. This will require tweaking the `FindMy_proxy`.
-# TIME_FRAME = owntag_options["time_frame"]
 
 print(f'{datetime.datetime.now().replace(microsecond=0).isoformat()}')
 
@@ -134,7 +131,7 @@ if __name__ == "__main__":
     # send reports to the owntags plugin
     if args.owntags:
         import OwnTags_plugin
-        ordered = OwnTags_plugin.owntags(ordered, time_seconds, found, prefixes, missing)
+        ordered = OwnTags_plugin.owntags(ordered, time_seconds, found)
     
     # print results summary
     print(f'{"looked for:":<14}{prefixes}')  

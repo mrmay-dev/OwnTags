@@ -4,6 +4,10 @@
 import json
 import datetime
 import paho.mqtt.publish as publish
+
+# on this branch the options and secrets are saved in the outputfolder,
+# this way .gitignore prevents sharing sensitive information like keys
+# and passwords
 from output.mysecrets import owntag_options
 from output.mysecrets import mqtt_secrets
 
