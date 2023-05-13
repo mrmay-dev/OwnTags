@@ -6,12 +6,11 @@
 import argparse
 import json
 import ssl
+import re
 
 from apple_cryptography import *
 
-from output.mysecrets import owntag_options
 OUTPUT_FOLDER = 'output/'
-TIME_FRAME = owntag_options["time_frame"]
 
 print(f'{datetime.datetime.now().replace(microsecond=0).isoformat()}')
 
@@ -20,14 +19,29 @@ if __name__ == "__main__":
     print('Using python3' if isV3 else 'Using python2')
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-m', '--minutes', help='only show reports not older than these hours', type=int, default=TIME_FRAME)
+        '-t', '--time', help='only show reports less than hh:mm (hours:minutes) old', default='00:00')
+    parser.add_argument(
+        '-d', '--days', help='only show reports less than these days.', type=int, default=0)
     parser.add_argument(
         '-p', '--prefix', help='only use keyfiles starting with this prefix', default='')
     parser.add_argument(
         '-k', '--key', help="iCloud decryption key ($ security find-generic-password -ws 'iCloud')")
     parser.add_argument(
-        '-o', '--owntracks', help="Enable experimental OwnTracks integration", action='store_true')
+        '-o', '--owntags', help="Enable experimental OwnTracks integration", action='store_true')
+    parser.add_argument(
+        '-b', '--tinydb', help="add reports to TinyDB database", action='store_true')
     args = parser.parse_args()
+
+    pattern = re.compile("\d{1,2}:\d{2}")
+    if not pattern.match(args.time):
+        raise ValueError('Time not formatted as hh:mm.')
+    else:
+        hours_minutes = (args.time).split(":")
+        hours = int(hours_minutes[0])
+        minutes = int(hours_minutes[1])
+
+    time_window = (((hours * 60) + minutes) + (args.days * 24 * 60)) * 60
+
     iCloud_decryptionkey = args.key if args.key else retrieveICloudKey()
 
     AppleDSID, searchPartyToken = getAppleDSIDandSearchPartyToken(iCloud_decryptionkey)
@@ -68,8 +82,7 @@ if __name__ == "__main__":
                     ids[hashed_adv] = priv
                     names[hashed_adv] = name
 
-    minutes = 60 * args.minutes
-    startdate = unixEpoch - minutes
+    startdate = unixEpoch - time_window
 
     keys = '","'.join(ids.keys())
 
@@ -82,7 +95,10 @@ if __name__ == "__main__":
 
     conn.request("POST", "/acsnservice/fetch", data, request_headers)
     response = conn.getresponse()
-    print(response.status, response.reason)
+    response_status = (response.status, response.reason)
+    print(response_status[0], response_status[1])
+    if response.status == 500:
+        raise Exception(response_status)
     res = json.loads(response.read())['results']
     print('\n%d reports received.' % len(res))
     # print(res)
@@ -119,16 +135,25 @@ if __name__ == "__main__":
     missing = list(prefixes)
     for each in found:
         missing.remove(each)
+    reports_used = len(ordered)
+    print(f'{reports_used} reports used.')
+    # print(f'list all: {prefixes}\nmissing: {missing}\nfound: {found}')
 
-    print(f'{len(ordered)} reports used.')
-    print(f'list all: {prefixes}\nmissing: {missing}\nfound: {found}')
+    if args.tinydb and len(ordered) > 0:
+        from tinydb import TinyDB
+        # 2023-05-12T2215_Fri %Y-%m-%dT%H%M_a%
+        today_is = '{:%Y-%m-%d_%a}'.format(datetime.datetime.now())
+        db = TinyDB(f'./output/tinydb/{today_is}.json')
+        for each in ordered:
+            db.insert(each)
+        print(f'{reports_used} reports written to file.')
 
-    if args.owntracks:
+    if args.owntags:
         import OwnTags_plugin
-        ordered = OwnTags_plugin.owntags(ordered, args.minutes, args.prefix, prefixes, found, missing)
+        ordered = OwnTags_plugin.owntags(ordered, time_window, found)
 
-    if ordered is not None:
-        print(f'\n{"looked for:":<14}{prefixes}')
-        print(f'{"missing keys:":<14}{missing}')
-        print(f'{"found:":<14}{list(found)}')
+    print(f'\n{"looked for:":<14}{prefixes}')
+    print(f'{"missing keys:":<14}{missing}')
+    print(f'{"found:":<14}{list(found)}')
+    if len(ordered) > 0:
         print(json.dumps(ordered, indent=4))  # use `separators=(',', ':')` for minimized output
