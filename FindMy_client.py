@@ -79,7 +79,7 @@ if __name__ == "__main__":
     # time in seconds
     time_seconds = ((args.days * 24 * 60) + (hours * 60) + minutes) * 60
 
-    payload = {"days": time_seconds, "ids": keys}
+    payload = {"seconds": time_seconds, "ids": keys}
     print(f'\nPayload:\n{json.dumps(payload, indent=4)}')
     if payload["ids"][0] == "":
         # catching an error when user enters unlisted prefix
