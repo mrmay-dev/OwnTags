@@ -4,11 +4,11 @@
 import json
 import datetime
 import paho.mqtt.publish as publish
-from mysecrets import owntag_options
-from mysecrets import mqtt_secrets
+from secrets import owntag_options
+from secrets import mqtt_secrets
 
 
-def owntags(ordered, args_minutes, found_keys, prefixes, missing):
+def owntags(ordered, time_window, found_keys):
     """This function processess the location reports from request_reports.py
     and outputs them as OwnTracks MQTT reports.
     """
@@ -77,6 +77,8 @@ def owntags(ordered, args_minutes, found_keys, prefixes, missing):
         try:
             creation_stamp = owntag_options[prefix]["tst"]
         except KeyError as e:
+            unknown_key = f'Used 1000000000 as creation_stamp for {prefix}\n{e}'
+            print(unknown_key)
             creation_stamp = 1000000000
         # print(f"Creation Stamp: {creation_stamp}")
 
@@ -135,7 +137,7 @@ def owntags(ordered, args_minutes, found_keys, prefixes, missing):
             "creation_stamp": creation_stamp,
             "status_topic": status_topic,
             "check_time": check_time,
-            "report_minutes": args_minutes,
+            "report_minutes": round(time_window/60,2),
             "reports_count": len(key_list),
             "last_report": key_list  # (this is actually the list of locations)
         }
@@ -152,7 +154,7 @@ def owntags(ordered, args_minutes, found_keys, prefixes, missing):
         # TODO: if status_msg:  # a KPI message sent to the status_topic base
         # meta_report = {
         #     "check_time": check_time,
-        #     "report_minutes": args_minutes,
+        #     "report_minutes": time_window,
         #     "reports_count": len(ordered),
         #     "all_tags" = prefixes,
         #     "found_tags" = found,
@@ -174,7 +176,7 @@ def owntags(ordered, args_minutes, found_keys, prefixes, missing):
 
         del latest_report_metadata["last_report"][0:reports_num]
         output_message.append(latest_report_metadata)
-    
+
     publish.multiple(
         # Publish messages to MQTT broker
         report_update, hostname=broker_address,
