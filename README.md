@@ -1,5 +1,5 @@
 # Ⓣ OwnTags
-![#f03c15](https://placehold.co/15x15/50bf54/50bf54.png) The purpose of this branch is to try using a proxy/client configurtion.
+![#f03c15](https://placehold.co/15x15/50bf54/50bf54.png) The purpose of this branch is to try using a proxy / client configurtion.
 
 I work on this for a little in the evenings after work, please bear with me as I complete the documentation. Thanks!
 
@@ -19,7 +19,7 @@ X-Wing: 33.814162638077384, -117.92309657349315
 -->
 ## Installation 
 
-This is a very new project and is under active development. I'm not the greatest programmer (something I picked up during COVID) so I learn as I go... meaning this thing could break at any moment for very silly reasons. That said, I am totally excited about it and hope a few others will join me to build something interesting.
+This is a very new project and is under active development. I'm not the greatest programmer (something I picked up during COVID) so I learn as I go... meaning this thing could break at any moment for very silly reasons. That said, I am excited about it and hope a few others will join me to build something interesting. This work [builds the work of others](https://github.com/mrmay-dev/owntags/tree/dev-client#notes-of-gratitude).
 
 ### Requirements:
 
