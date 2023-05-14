@@ -20,5 +20,5 @@ cd "$SCRIPT_DIR"
 # use this for the standalone method
 python3 request_reports.py --time $1 --owntags --tinydb
 
-echo "-- End Script --"
+echo "-- END SCRIPT --"
 echo
