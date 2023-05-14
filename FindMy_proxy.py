@@ -30,8 +30,8 @@ class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
         print('Getting with post: ' + str(post_body))
         UTCTime, Timezone, unixEpoch = getCurrentTimes()
         body = json.loads(post_body)
-        # CHANGED: days to seconds. Simpler API
-        if "seconds" in body:  # keeping 'days' to preserve API original language
+        # CHANGED: not useing `days`. Now using `seconds`.
+        if "seconds" in body:
             seconds = body['seconds']
         else: 
             seconds = 7 * 86400  # query for seven days if 'seconds' key is not present

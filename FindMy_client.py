@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-# This script retreives reports from FindMy_proxy.py and
-# - prints them to the console/terminal or,
-# - serves them to OwnTags_plugin.py for processing (use `-o` or `--owntags`).
+# This script retreives reports from FindMy_proxy.py
+# - prints them to the console/terminal (see `secrets.py` for options),
+# - serves them to OwnTags_plugin.py for processing (use `-o` or `--owntags`)
+# - adds the records to a TinyDB database (use `-b` or `--tinydb`)
 
 # THIS IS STILL IN ROUGH STAGES OF DEVELOPMENT.
 # A LOT OF THE CODE HERE WILL BE CUT OUT OR CHANGED
@@ -15,6 +16,8 @@ import re
 from apple_cryptography import *
 
 OUTPUT_FOLDER = 'output/'
+# TODO: add a minutes time_frame. This will require tweaking the `FindMy_proxy`.
+# TIME_FRAME = owntag_options["time_frame"]
 
 print(f'{datetime.datetime.now().replace(microsecond=0).isoformat()}')
 
