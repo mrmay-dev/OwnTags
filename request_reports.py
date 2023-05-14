@@ -3,7 +3,9 @@
 # This script fetches OpenHaystack reports and prints them to the console
 # or serves them OwnTags_plugin.py for processing.
 
+import datetime
 import argparse
+import time
 import json
 import ssl
 import re
@@ -12,7 +14,10 @@ from apple_cryptography import *
 
 OUTPUT_FOLDER = 'output/'
 
-print(f'{datetime.datetime.now().replace(microsecond=0).isoformat()}')
+start_script = '{:%Y %b %d (%a) %H:%M:%S}'.format(datetime.datetime.now())
+
+print(f'{start_script}')
+start_script = time.monotonic()
 
 if __name__ == "__main__":
     isV3 = sys.version_info.major > 2
@@ -28,7 +33,7 @@ if __name__ == "__main__":
         '-k', '--key', help="iCloud decryption key ($ security find-generic-password -ws 'iCloud')")
     parser.add_argument(
         '-o', '--owntags', help="Enable experimental OwnTracks integration", action='store_true')
-    parser.add_argument(  # will change to use FluxDB small time-series database
+    parser.add_argument(  # willby switching to tinyfluxDB (https://github.com/citrusvanilla/tinyflux)
         '-b', '--tinydb', help="add reports to TinyDB database", action='store_true')
     args = parser.parse_args()
 
@@ -103,6 +108,8 @@ if __name__ == "__main__":
     print('\n%d reports received.' % len(res))
     # print(res)
 
+    get_reports = time.monotonic()
+
     ordered = []
     found = set()
     for report in res:
@@ -155,5 +162,24 @@ if __name__ == "__main__":
     print(f'\n{"looked for:":<14}{prefixes}')
     print(f'{"missing keys:":<14}{missing}')
     print(f'{"found:":<14}{list(found)}')
-    if len(ordered) > 0:
+
+    update_send = "~:~~"
+    if len(found) > 0:
+
+        send_time = ordered[len(ordered)-1]
+        for key in send_time:
+            send_time_key = key
+            send_time_value = send_time[key]
+
+        update_send = f'{send_time[key] - start_script:0.2f}s'
+        ordered.pop()
+
         print(json.dumps(ordered, indent=4))  # use `separators=(',', ':')` for minimized output
+
+end_script = time.monotonic()
+print()
+print(f'{"start:":<10} {start_script - start_script:0.2f}s')
+print(f'{"received:":<10} {get_reports - start_script:0.2f}s')
+print(f'{"MQTT sent:":<10} {update_send}')
+print(f'{"end:":<10} {end_script - start_script:0.2f}s')
+# print(f'time: {end_script.replace(microsecond=0).isoformat()}')
