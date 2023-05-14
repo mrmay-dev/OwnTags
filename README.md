@@ -1,5 +1,7 @@
 # OwnTags
 
+![#f03c15](https://placehold.co/5x5/50bf54/50bf54.png) The purpose of this branch is to try using a proxy/client configurtion.
+
 I work on this for a little in the evenings after work, please bear with me as I complete the documentation. Thanks!
 
 > **Updated on May 10, 2023:** I'm not very good at managing a git. Good thing no one is making pull requests. I think I'd royally mess things up. I like this configuration. The work done over at headless-haystack can be tracked on the `headless-main` branch and the OwnTags-specific changes can continue on the main.
