@@ -1,6 +1,6 @@
-# OwnTags
+# Ⓣ OwnTags
 
-![#f03c15](https://placehold.co/5x5/50bf54/50bf54.png) The purpose of this branch is to try using a proxy/client configurtion.
+![#f03c15](https://placehold.co/15x15/50bf54/50bf54.png) The purpose of this branch is to try using a proxy/client configurtion.
 
 I work on this for a little in the evenings after work, please bear with me as I complete the documentation. Thanks!
 
