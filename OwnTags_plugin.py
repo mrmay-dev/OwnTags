@@ -2,12 +2,9 @@
 # reports on MQTT.
 
 import json
+import time
 import datetime
 import paho.mqtt.publish as publish
-
-# on this branch the options and secrets are saved in the outputfolder,
-# this way .gitignore prevents sharing sensitive information like keys
-# and passwords
 from output.mysecrets import owntag_options
 from output.mysecrets import mqtt_secrets
 
@@ -187,8 +184,11 @@ def owntags(ordered, time_window, found_keys):
         port=broker_port, client_id="the_script", keepalive=60,
         auth={'username': broker_user, 'password': broker_pass}, tls=broker_tls,
     )
-
-    print(f"{len(report_update)} messages sent!")
+    
+    update_send = {"update_send": time.monotonic()}
+    print(f"{len(report_update)} messages sent!\n\
+        update send: {update_send}")
+    output_message.append(update_send)
 
     if print_history == 0:
         output_message = None
