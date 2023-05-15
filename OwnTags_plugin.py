@@ -1,5 +1,6 @@
-# this script takes location reports and publishes them as OwnTracks
-# reports on MQTT.
+# This script takes OpenHaystack location reports and publishes them over MQTT 
+# as OwnTracks location reports.
+# TODO: implement checks so that messages are published to topics as described in `secrets.py`
 
 import json
 import time
