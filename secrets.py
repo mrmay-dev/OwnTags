@@ -1,3 +1,4 @@
+# https://practicalgit.com/blog/make-git-ignore-local-changes-to-tracked-files.html
 
 owntag_options = {
     "password": "password",  # macOS password
