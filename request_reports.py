@@ -169,11 +169,10 @@ if __name__ == "__main__":
         send_time = ordered[len(ordered)-1]
         for key in send_time:
             send_time_key = key
-            send_time_value = send_time[key]
-
-        update_send = f'{send_time[key] - start_script:0.2f}s'
-        ordered.pop()
-
+        if send_time_key == "update_send":    
+            update_send = f'{send_time[key] - start_script:0.2f}s'
+            ordered.pop()
+        
         print(json.dumps(ordered, indent=4))  # use `separators=(',', ':')` for minimized output
 
 end_script = time.monotonic()
