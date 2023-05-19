@@ -1,0 +1,37 @@
+# https://practicalgit.com/blog/make-git-ignore-local-changes-to-tracked-files.html
+
+[owntag_options]
+password = "password"  # macOS password
+
+[Console_Printing]
+# positive numbers (4), the number of messages you want to see
+# negative numbers (-1) will print all fetched locations,
+# 0 will turn printing fetched locations off
+print_history = 1
+
+[Status_Messages]
+# Status messages can be sent to an MQTT Topic
+status_msg = false  # publish status and metadata
+status_base = "status/owntags"  # topic for status messages
+
+[Owntracks_Options]
+owntracks_device = "owntracks/user"  # user Topic Base of your phone, used for waypoints
+owntags_base = nan  # topic base for tags. If `None` owntracks_devcies will be used.
+
+[[tag_options]]   # duplicate this block including the [[title]] for each tag, adjust as needed.
+tag_prefix = "tag"  # the prefix of your tag
+location = true   # (not required) locations are seen by everyone with access to the topic (they act like users)
+waypoint = false  # (not required) waypoints are only seen on your phone (or device)
+radius = false    # (not required) use number for radius in meters, if `false` turn off, if `true` use confidence
+mqtt_topic = nan  # (not required)  topic for this tag, if `nan` owntags_base will be used
+timestamp = nan   # (not required) only needed if you want custom timestamps. this can be any past Unix/Posix timestamp
+status_topic = false    # (not required) if `True` messages will be published to `status_base`/prefix
+
+[[mqtt_secrets]]  # duplicate this block including the [[title]] for each tag, adjust as needed.
+mqtt_broker = ""  # broker address
+mqtt_port = 1883  # 1883 if no TLS; 8883 if TLS
+    # download HiveMQ certificate: https://community.hivemq.com/t/frequently-asked-questions/514
+    # "mqtt_tls = {"ca_certs = "output/isrgrootx1.cer"}  # where the cert file located
+    # create users at https://console.hivemq.com
+mqtt_user = "user"  # Broker user
+mqtt_pass = "password"  # Broker password
