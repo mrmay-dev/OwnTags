@@ -4,13 +4,13 @@
 password = "password"  # macOS password
 
 [Console_Printing]
-# positive numbers (4), the number of messages you want to see
-# negative numbers (-1) will print all fetched locations,
-# 0 will turn printing fetched locations off
+    # positive numbers (4), the number of messages you want to see
+    # negative numbers (-1) will print all fetched locations,
+    # 0 will turn printing fetched locations off
 print_history = 1
 
 [Status_Messages]
-# Status messages can be sent to an MQTT Topic
+    # Status messages can be sent to an MQTT Topic
 status_msg = false  # publish status and metadata
 status_base = "status/owntags"  # topic for status messages
 
@@ -31,7 +31,7 @@ status_topic = false    # (not required) if `True` messages will be published to
 mqtt_broker = ""  # broker address
 mqtt_port = 1883  # 1883 if no TLS; 8883 if TLS
     # download HiveMQ certificate: https://community.hivemq.com/t/frequently-asked-questions/514
-    # "mqtt_tls = {"ca_certs = "output/isrgrootx1.cer"}  # where the cert file located
+    # mqtt_tls = "{'ca_certs' = 'output/isrgrootx1.cer'}"  # where the cert file located
     # create users at https://console.hivemq.com
 mqtt_user = "user"  # Broker user
 mqtt_pass = "password"  # Broker password
