@@ -133,3 +133,4 @@ venv/
 required.sh
 
 scratch/
+mysecrets.py
