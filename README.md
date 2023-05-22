@@ -1,9 +1,9 @@
 # Ⓣ OwnTags
-![#f03c15](https://placehold.co/15x15/50bf54/50bf54.png) The purpose of this branch is to try using a proxy / client configurtion.
+![#f03c15](https://placehold.co/15x15/50bf54/50bf54.png) The purpose of this branch is to try using a proxy / client configurtion AND to implement using a TOML file for settings.
 
 I work on this for a little in the evenings after work, please bear with me as I complete the documentation. Thanks!
 
-> **Updated on May 10, 2023:** I'm not very good at managing a git. Good thing no one is making pull requests. I think I'd royally mess things up. I like this configuration. The work done over at headless-haystack can be tracked on the `headless-main` branch and the OwnTags-specific changes can continue on the main.
+> **Updated on May 21, 2023:** This branch now uses a TOML file for configuration. Hopefully, comments in the file make it self explanatory. Also, I'm hoping the directory structure reduces clutter and makes the project easier to look at.
 
 This project makes it possible to use [OwnTracks](https://owntracks.org/) apps ([Android](https://play.google.com/store/apps/details?id=org.owntracks.android), [iOS](https://itunes.apple.com/us/app/mqttitude/id692424691?mt=8) and [web](https://github.com/owntracks/frontend)) as the app for following and viewing Haystack tags.
 
