@@ -1,8 +1,6 @@
 #!/bin/bash
 # https://linuxconfig.org/how-to-use-a-bash-script-to-run-your-python-scripts
 
-echo
-echo "-- START SCRIPT --"
 # Directory of this script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
@@ -18,8 +16,8 @@ cd "$SCRIPT_DIR/application"
 # python3 FindMy_client.py --time $1 --owntags
 
 # use this for the standalone method
-python3 request_reports.py --time $1
-# python3 request_reports.py --time $1 --owntags --tinydb
+# python3 request_reports.py --time $1
+python3 request_reports.py --time $1 --owntags --tinydb
 
 echo "-- END SCRIPT --"
 echo
