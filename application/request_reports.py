@@ -11,8 +11,11 @@ import ssl
 import re
 
 from apple_cryptography import *
+from OwnTags_plugin import get_configuration
 
-OUTPUT_FOLDER = 'output/'
+# Get configuration
+configuration = get_configuration()
+OUTPUT_FOLDER = configuration["owntag_options"]["output_folder"]
 
 start_script = '{:%Y %b %d (%a) %H:%M:%S}'.format(datetime.datetime.now())
 
@@ -103,6 +106,11 @@ if __name__ == "__main__":
     response_status = (response.status, response.reason)
     print(response_status[0], response_status[1])
     if response.status == 500:
+        print(f'''
+        HELP: This error is generally happens when something is wrong with the request.
+        Usually, no keys were requested.  Check the `output_folder` in `settings.toml`,
+        is there a trailing `/` in the folder name?
+        ''')
         raise Exception(response_status)
     res = json.loads(response.read())['results']
     print('\n%d reports received.' % len(res))
@@ -156,8 +164,8 @@ if __name__ == "__main__":
         print(f'{reports_used} reports written to file.')
         
     if args.owntags:
-        import OwnTags_plugin
-        ordered = OwnTags_plugin.owntags(ordered, time_window, found)
+        from OwnTags_plugin import owntags
+        ordered = owntags(ordered, time_window, found)
 
     print(f'\n{"looked for:":<14}{prefixes}')
     print(f'{"missing keys:":<14}{missing}')

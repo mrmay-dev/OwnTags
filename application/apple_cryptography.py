@@ -15,8 +15,10 @@ from cryptography.hazmat.primitives.asymmetric import ec
 import objc, six, sys
 from Foundation import NSBundle, NSClassFromString, NSData, NSPropertyListSerialization
 
-from output.mysecrets import secrets
-password = secrets["password"]  # Keychain password, can be hardcoded
+# Get configuration parameters
+from OwnTags_plugin import get_configuration
+configuration = get_configuration()
+password = configuration["owntag_options"]["password"]  # Keychain password, can be hardcoded
 
 
 def bytes_to_int(b):

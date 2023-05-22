@@ -5,17 +5,41 @@ import json
 import time
 import datetime
 import paho.mqtt.publish as publish
-from output.mysecrets import owntag_options
-from output.mysecrets import mqtt_secrets
+import sys
+
+
+def get_configuration():
+    """ Check Python version and decide how to handle TOML
+    """
+    py_major, py_minor, py_micro, py_release, serial = sys.version_info
+    version = float(f'{py_major}.{py_minor}')
+    if version >= 3.11:
+        import tomllib as toml
+    elif version >= 3.7:
+        import tomli as toml
+    elif version < 3.7:
+        print(f'Found Python {version}.\nUpgrade to python 3.7 or higher')
+        exit()
+
+    with open('../settings.toml', mode='rb') as fp:
+        configuration = toml.load(fp)
+
+    return configuration
 
 
 def owntags(ordered, time_window, found_keys):
     """This function processess the location reports from request_reports.py
     and outputs them as OwnTracks MQTT reports.
     """
-
     check_time = datetime.datetime.now().replace(microsecond=0).isoformat()
-    # Pull settings from secrets.py
+
+    # Get configuration settings
+    configuration = get_configuration()
+    owntag_options = configuration["owntag_options"]
+    owntracks_options = configuration["owntracks_options"]
+    tag_options = configuration["tag_options"]
+    mqtt_secrets = configuration["mqtt_secrets"]
+
     # MQTT Options
     broker_address = mqtt_secrets["mqtt_broker"]
     broker_port = mqtt_secrets["mqtt_port"]
@@ -25,10 +49,15 @@ def owntags(ordered, time_window, found_keys):
 
     # OwnTag Options
     print_history = owntag_options["print_history"]
-    owntracks_device = owntag_options["owntracks_device"]
-    haystack_base = owntag_options["owntags_base"]
     status_msg = owntag_options["status_msg"]
     status_base = owntag_options["status_base"]
+
+    owntracks_device = owntracks_options["owntracks_device"]
+    if str(owntracks_options["owntags_base"]) == "nan":
+        haystack_base = owntracks_device
+    else:
+        haystack_base = owntracks_options["owntags_base"]
+
     if not status_msg:
         status_base = "Status messages turned off"
 
@@ -49,6 +78,7 @@ def owntags(ordered, time_window, found_keys):
     """Main script"""
     output_message = []
     report_update = []
+
     for key in found_keys:
         # setup MQTT topics
         waypoint_topic = f"{owntracks_device}/cmd"
@@ -57,7 +87,7 @@ def owntags(ordered, time_window, found_keys):
         if not status_msg:
             status_topic = status_base
 
-        # sort reports
+        # make a list of reports for the key
         key_list = []
         for item in range(len(ordered)):
             if ordered[item]["key"] == key:
@@ -76,14 +106,14 @@ def owntags(ordered, time_window, found_keys):
 
         # TODO waypoint timestamps
         try:
-            creation_stamp = owntag_options[prefix]["tst"]
+            creation_stamp = tag_options[prefix]["timestamp"]
         except KeyError as e:
             unknown_key = f'Used 1000000000 as creation_stamp for {prefix}\n{e}'
             print(unknown_key)
             creation_stamp = 1000000000
         # print(f"Creation Stamp: {creation_stamp}")
 
-        if owntag_options[prefix]["location"]:
+        if tag_options[prefix]["location"]:
             location_msg = {
                 # object that updates device location
                 # construct MQTT message
@@ -104,7 +134,7 @@ def owntags(ordered, time_window, found_keys):
             }
             report_update.append(location_payload)
 
-        if owntag_options[prefix]["waypoint"]:
+        if tag_options[prefix]["waypoint"]:
             waypoint_msg = {
                 # object that re-publishes (updates) a waypoint location
                 # construct MQTT message
@@ -138,12 +168,12 @@ def owntags(ordered, time_window, found_keys):
             "creation_stamp": creation_stamp,
             "status_topic": status_topic,
             "check_time": check_time,
-            "report_minutes": round(time_window/60,2),
+            "report_minutes": round(time_window/60, 2),
             "reports_count": len(key_list),
             "last_report": key_list  # (this is actually the list of locations)
         }
 
-        if status_msg:  # TODO or if owntag_options[key]["status"]
+        if status_msg:  # TODO or if tag_options[key]["status"]
             last_report_payload = {
                 # construct MQTT message
                 "topic": status_topic,
@@ -170,14 +200,14 @@ def owntags(ordered, time_window, found_keys):
         # report_update.append(meta_payload)
 
         # Trim report list to print_history number before creating output_message
-        # print_history = owntag_options["print_history"]
+        # print_history = tag_options["print_history"]
         if print_history > last_report_num+1 or print_history < 0:
             print_history = last_report_num+1
         reports_num = (last_report_num+1) - print_history
 
         del latest_report_metadata["last_report"][0:reports_num]
         output_message.append(latest_report_metadata)
-    
+
     publish.multiple(
         # Publish messages to MQTT broker
         report_update, hostname=broker_address,
@@ -186,8 +216,7 @@ def owntags(ordered, time_window, found_keys):
     )
     
     update_send = {"update_send": time.monotonic()}
-    print(f"{len(report_update)} messages sent!\n\
-        update send: {update_send}")
+    print(f"{len(report_update)} messages sent!")
     output_message.append(update_send)
 
     if print_history == 0:
