@@ -17,7 +17,7 @@ cd "$SCRIPT_DIR/application"
 
 # use this for the standalone method
 # python3 request_reports.py --time $1
-python3 request_reports.py --time $1 --owntags --tinydb
+# python3 request_reports.py --time $1 --prefix $2
+python3 request_reports.py --time $1 --owntags
 
 echo "-- END SCRIPT --"
-echo
