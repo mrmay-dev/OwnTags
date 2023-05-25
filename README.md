@@ -3,7 +3,7 @@
 
 I work on this for a little in the evenings after work, please bear with me as I complete the documentation. Thanks!
 
-> **Updated on May 21, 2023:** This branch now uses a TOML file for configuration. Hopefully, comments in the file make it self explanatory. Also, I'm hoping the directory structure reduces clutter and makes the project easier to look at.
+> **Updated on May 25, 2023:** This branch now uses a TOML file for configuration. Hopefully, comments in the file make it self explanatory. Also, I'm hoping the directory structure reduces clutter and makes the project easier to look at.
 
 This project makes it possible to use [OwnTracks](https://owntracks.org/) apps ([Android](https://play.google.com/store/apps/details?id=org.owntracks.android), [iOS](https://itunes.apple.com/us/app/mqttitude/id692424691?mt=8) and [web](https://github.com/owntracks/frontend)) as the app for following and viewing Haystack tags.
 
@@ -64,56 +64,46 @@ source venv/bin/activate
 
 ### Configure
 
-Edit the `secrets.py` with your settings. There are notes in there to guide you. 
+Edit the `settings.toml` file with your settings.
 
-Apple's FindMy location messages are encrypted on the tag and decrypted on the computer that receives them. To do that, the script needs your password so it can access the system keychain and decode location messages.
+```toml
 
-```python
-secrets = {
-    "password": "macOSpassowrd",  # your device's password to access keychain and decrypt messages.
-```
-
-Optionally, the script can print location reports to the terminal. I like to see the latest, but listing all messages can be useful for debugging. 
-
-```python
-    # == Console Printing
+[owntag_options]
+password = "password"  # macOS password
+print_history = 1
     # positive numbers (4), the number of messages you want to see
     # negative numbers (-1) will print all fetched locations,
     # 0 will turn printing fetched locations off
-    "print_history": 1,
+status_msg = false  # publish status and metadata
+    # Status messages can be sent to an MQTT Topic
+status_base = "status/owntags"  # topic for status messages
+
+[mqtt_secrets]
+mqtt_broker = "your-broker.com"  # broker address
+mqtt_port = 1883  # 1883 if no TLS; 8883 if TLS
+mqtt_tls = "None"  # Comment out if using TLS
+mqtt_user = "username"  # Broker user
+mqtt_pass = "password"  # Broker password
+# [mqtt_secrets.mqtt_tls]  # If TLS is activated, use this
+# ca_certs = "output/isrgrootx1.cer"  # where the cert file located
+    # download HiveMQ certificate: https://community.hivemq.com/t/frequently-asked-questions/514
+    # create users at https://console.hivemq.com
+
+[owntracks_options]
+owntracks_device = "owntracks/user"  # Topic Base of your phone, used for waypoints
+owntags_base = nan  # topic Base for tags. If `nan` owntracks_devce will be used.
+
+[tag_options.prefix]
+location = true   # (not required) locations are seen by everyone with access to the topic (they act like users)
+waypoint = false  # (not required) waypoints are only seen on your phone (or device)
+timestamp = 1000000001   # (required for wayponts) Must be unique, can be any past Unix/Posix timestamp.
+radius = false    # (not required) use number for radius in meters, if `false` turn off, if `true` use confidence
+mqtt_topic = nan  # (not required)  topic for this tag, if `nan` owntags_base will be used
+status_topic = false    # (not required) if `True` messages will be published to `status_base`/prefix
+# tag_name = "Tag Name"  #  (not implementented, yet) the display name of the tag
+# tag_image = nan  #  (not implementented, yet) base 64 encoded, 200x200, PNG or JPEG image
+
 ```
-
-Console Messages can be sent to an MQTT Topic.
-
-```
-    # == Status Messages
-    # Console Messages can be sent to an MQTT Topic
-    "status_msg": False,  # publish status and metadata
-    "status_base": "status/owntags",  # topic for status messages
-```
-
-In OwnTracks, users can have multiple devices (phone, tablet, computer, etc), tags are just another device. Typically, you'll want tags to publish as your device. By [editing the MQTT ACLs](https://duckduckgo.com/?q=mqtt+acl&t=brave&ia=web) you can control topics that are visible to others, shared devices could be put on a shared topic.
-
-```python
-    # == Owntracks Options
-    "owntracks_device": "owntracks/richard",  # user Topic Base of your phone, used for waypoints
-    "owntags_base": None,  # topic base for tags. If `None` owntracks_devcies will be used.
-```    
-
-Each device must have its own configuration. To do that, duplicate this key for each device and **change `tag_prefix`** to your tag's prefix and the **`"tst"` value to a unique Unix timestamp**.
-
-```python 
-    # == Device options
-    "tag_prefix": {  # this is the prefix of your tag.
-        "tst": 1000000001,  # this can be any past Unix/Posix timestamp
-        "waypoint": False,  # Waypoints are only seen on your phone (or device)
-        "location": True,  # locations are seen by everyone with access to the topic (they act like users)
-        "status": False,  # if `True` messages will be published to `status_base`/prefix
-        "mqtt_topic": None,  # topic for this tag, if `None` owntags_base will be used
-    },
-}
-```
-
 
 [Sorry all, this all I had time for tonight. I add a little each day after work.]
  
