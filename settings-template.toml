@@ -1,0 +1,35 @@
+# https://practicalgit.com/blog/make-git-ignore-local-changes-to-tracked-files.html
+# https://realpython.com/python-toml/#load-toml-with-python
+
+[owntag_options]
+password = "password"  # macOS password
+print_history = 1
+    # positive numbers (4), the number of messages you want to see
+    # negative numbers (-1) will print all fetched locations,
+    # 0 will turn printing fetched locations off
+status_msg = false  # publish status and metadata
+    # Status messages can be sent to an MQTT Topic
+status_base = "status/owntags"  # topic for status messages
+
+[mqtt_secrets]
+mqtt_broker = "your-broker.com"  # broker address
+mqtt_port = 1883  # 1883 if no TLS; 8883 if TLS
+mqtt_tls = "None"  # Comment out if using TLS
+mqtt_user = "username"  # Broker user
+mqtt_pass = "password"  # Broker password
+# [mqtt_secrets.mqtt_tls]  # If TLS is activated, use this
+# ca_certs = "output/isrgrootx1.cer"  # where the cert file located
+    # download HiveMQ certificate: https://community.hivemq.com/t/frequently-asked-questions/514
+    # create users at https://console.hivemq.com
+
+[owntracks_options]
+owntracks_device = "owntracks/user"  # Topic Base of your phone, used for waypoints
+owntags_base = nan  # topic Base for tags. If `nan` owntracks_devce will be used.
+
+[tag_options.prefix]
+location = true   # (not required) locations are seen by everyone with access to the topic (they act like users)
+waypoint = false  # (not required) waypoints are only seen on your phone (or device)
+timestamp = 1000000001   # (required for wayponts) Must be unique, can be any past Unix/Posix timestamp.
+radius = false    # (not required) use number for radius in meters, if `false` turn off, if `true` use confidence
+mqtt_topic = nan  # (not required)  topic for this tag, if `nan` owntags_base will be used
+status_topic = false    # (not required) if `True` messages will be published to `status_base`/prefix
