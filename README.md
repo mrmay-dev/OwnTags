@@ -130,13 +130,13 @@ status_topic = false    # (not required) if `True` messages will be published to
 ```
 
 ### Run
-There are a couple of ways to start. The `owntags.sh` bash script will load the Python environment and fetch reports for the time specified.
+There are a couple of ways to start. The `owntags.sh` bash script will load the Python environment and fetch reports. Time is specified with `hh:mm` format.
 
 ```bash
 ./owntags.sh 0:30
 ```
 
-Optionally, drop into the `application` folder and start `request_reports.py` manually:
+Optionally, drop into the `application` folder and start `request_reports.py` manually. `--owntags` tells the script to send locations to OwnTracks:
 
 ```bash
 cd application
