@@ -77,7 +77,7 @@ You will need:
 * MQTT broker information
 * OwnTracks broker topics
 
-####KeyFiles
+#### KeyFiles
 
 Create directory `applicaton/keys/` and put your keyfiles in there:
 
@@ -89,7 +89,7 @@ owntags/
         └── prefix-2.keyfile
 ```
 
-####Settings
+#### Settings
 
 Add your iTunes password, MQTT broker details and OwnTracks topics to the `settings.toml` file.
 
