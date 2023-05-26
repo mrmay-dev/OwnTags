@@ -41,13 +41,19 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # check that time fits hh:mm format and parse input
-    pattern = re.compile('\d{1,2}:\d{2}')
+    pattern = re.compile('\d{0,2}:?\d{2}')
     if not pattern.match(args.time):
         raise ValueError('Time not formatted as hh:mm.')
     else:
-        hours_minutes = (args.time).split(":")
-        hours = int(hours_minutes[0])
-        minutes = int(hours_minutes[1])
+        hours_minutes = args.time.split(":")
+        if 0 <= 1 < len(hours_minutes):
+            hours = int(hours_minutes[0])
+            minutes = int(hours_minutes[1])
+        else:
+            hours = 0
+            minutes = int(hours_minutes[0])
+    print(f'days: {args.days} hrs: {hours} min: {minutes}')    
+
     # calculate total seconds
     time_window = (((hours * 60) + minutes) + (args.days * 24 * 60)) * 60
     
