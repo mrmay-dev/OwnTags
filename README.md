@@ -21,7 +21,7 @@ X-Wing: 33.814162638077384, -117.92309657349315
 -->
 ## Installation 
 
-To use track tags with OwnTracks using this project you will need:
+To track tags with OwnTracks using this project you will need:
 
 1. MacOS Monterrey (v12) or higher. (This can be an actual Mac or a virtual one. Check out [Headless Haystack](https://github.com/dchristl/headless-haystack) for a complete solution.)
 
