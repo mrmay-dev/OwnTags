@@ -9,6 +9,8 @@ This project makes it possible to use [OwnTracks](https://owntracks.org/) apps (
 
 OwnTracks is well integrated into home automation projects like [Home Assistant](https://www.home-assistant.io/integrations/owntracks/) and [OpenHab](https://www.openhab.org/addons/bindings/gpstracker/). I can imagine some really cool things that could be done.
 
+These instructions are based on a Homebrew installed Python with a locally hosted MQTT broker. Make changes to reflect your system. Python commands should work with regualar Python as well. If you are using Anaconda then you probably know how to do these things in a `conda` environment.
+
 
 <!-- ![map displaying owntracks features like track lines, heatmaps and  regions](map-features.png "OwnTracks Map Features")
 
@@ -38,8 +40,6 @@ This is a very new project and is under active development. I'm not the greatest
 
 
 ### Install
-
-These instructions are based on a Homebrew installed Python with a locally hosted MQTT broker. Make changes to reflect your system. Python commands should work with regualar Python as well. If you are using Anaconda then you probably know how to do these things in a `conda` environment.
 
 **Download**
 - Download [the files](https://github.com/mrmay-dev/owntags/archive/refs/heads/dev-client.zip) in this branch.
@@ -130,7 +130,7 @@ status_topic = false    # (not required) if `True` messages will be published to
 ```
 
 ### Run
-There are a couple of ways to start. The `owntags.sh` bash script will load the Python environment and fetch reports. Time is specified with `hh:mm` format.
+There are a couple of ways to start. The `owntags.sh` bash script will load the Python environment and fetch reports. Time is specified with `hh:mm` format. Plain double digits (`42`) will be interpreted as minutes.
 
 ```bash
 ./owntags.sh 0:30
