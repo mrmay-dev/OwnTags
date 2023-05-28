@@ -27,23 +27,23 @@ if __name__ == "__main__":
     print('Using python3' if isV3 else 'Using python2')
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-t', '--time', help='only show reports less than hh:mm (hours:minutes) old', default='0:60')
+        '-t', '--time', help='Only show reports less than hh:mm (hours:minutes) or just "mm" old', default='0:60')
     parser.add_argument(
-        '-d', '--days', help='only show reports less than these days.', type=int, default=0)
+        '-d', '--days', help='Only show reports less than these days.', type=int, default=0)
     parser.add_argument(
-        '-p', '--prefix', help='only use keyfiles starting with this prefix', default='')
+        '-p', '--prefix', help='Only use keyfiles starting with this prefix', default='')
     parser.add_argument(
         '-k', '--key', help="iCloud decryption key ($ security find-generic-password -ws 'iCloud')")
     parser.add_argument(
         '-o', '--owntags', help="Enable OwnTracks integration", action='store_true')
     parser.add_argument(  # willby switching to tinyfluxDB (https://github.com/citrusvanilla/tinyflux)
-        '-b', '--tinydb', help="add reports to TinyDB database", action='store_true')
+        '-b', '--tinydb', help="Add reports to TinyDB database", action='store_true')
     args = parser.parse_args()
     
     # check that time fits hh:mm format and parse input
     pattern = re.compile('\d{0,2}:?\d{2}')
     if not pattern.match(args.time):
-        raise ValueError('Time not formatted as hh:mm.')
+        raise ValueError('Time not formatted as "hh:mm", or as "mm".')
     else:
         hours_minutes = args.time.split(":")
         if 0 <= 1 < len(hours_minutes):
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         else:
             hours = 0
             minutes = int(hours_minutes[0])
-    print(f'days: {args.days} hrs: {hours} min: {minutes}')    
+    print(f'Days: {args.days}, Hrs: {hours}, Min: {minutes}')    
 
     # calculate total seconds
     time_window = (((hours * 60) + minutes) + (args.days * 24 * 60)) * 60
@@ -154,16 +154,19 @@ if __name__ == "__main__":
             ordered.append(res)
 
     ordered.sort(key=lambda item: item.get('timestamp'))
-
+    
+    # Separate found and missing keys.
     found = list(found)
     missing = list(prefixes)
-    
     for each in found:
         missing.remove(each)
     reports_used = len(ordered)
     print(f'{reports_used} reports used.')
-    # print(f'list all: {prefixes}\nmissing: {missing}\nfound: {found}')
+    looking_for = f'\n{"Looked for:":<14}{prefixes}'
+    missing_keys = f'{"Missing keys:":<14}{missing}'
+    found_keys = f'{"Found:":<14}{list(found)}'
 
+    # Save to TinyDB if --tinydb flag is set.
     if args.tinydb and len(ordered) > 0:
         from tinydb import TinyDB
         # 2023-05-12T2215_Fri %Y-%m-%dT%H%M_a%
@@ -172,17 +175,15 @@ if __name__ == "__main__":
         for each in ordered:
             db.insert(each)
         print(f'{reports_used} reports written to file.')
-        
+    
+    # Publish to OwnTags if --owntags flag is set
     if args.owntags:
         from OwnTags_plugin import owntags
         ordered = owntags(ordered, time_window, found)
-        
-    looking_for = f'\n{"looked for:":<14}{prefixes}'
-    missing_keys = f'{"missing keys:":<14}{missing}'
-    found_keys = f'{"found:":<14}{list(found)}'
 
+    # Check if there is an update for time when MQTT messages were sent.
     update_send = "~:~~"
-    
+    send_time_key = None
     if len(found) > 0:
         # grab the time code when messages were sent
         send_time = ordered[len(ordered)-1]
@@ -202,7 +203,7 @@ if __name__ == "__main__":
     print(found_keys)
     print(missing_keys)
     print()
-    print(f'{"start:":<10} {start_script - start_script:0.2f}s')
-    print(f'{"received:":<10} {get_reports - start_script:0.2f}s')
+    print(f'{"Start:":<10} {start_script - start_script:0.2f}s')
+    print(f'{"Received:":<10} {get_reports - start_script:0.2f}s')
     print(f'{"MQTT sent:":<10} {update_send}')
-    print(f'{"end:":<10} {end_script - start_script:0.2f}s')
+    print(f'{"End:":<10} {end_script - start_script:0.2f}s')
