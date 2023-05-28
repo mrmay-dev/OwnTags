@@ -66,7 +66,7 @@ source venv/bin/activate
 
 ```bash
 pip install --upgrade pip
-pip install pyobjc cryptography six paho-mqtt requests  # tinydb, only if you want to export locations to this database
+pip install pyobjc cryptography six paho-mqtt  # tinydb, only if you want to export locations to this database
 ``` 
 
 ### Configure
