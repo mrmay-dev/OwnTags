@@ -8,7 +8,6 @@ import sys
 
 from apple_cryptography import *
 
-
 PORT = 6176
 
 class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -31,12 +30,16 @@ class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
         print('Getting with post: ' + str(post_body))
         UTCTime, Timezone, unixEpoch = getCurrentTimes()
         body = json.loads(post_body)
-        if "days" in body:
-            days = body['days']
+        # CHANGED: not useing `days`. Now using `seconds`.
+        if "seconds" in body:
+            seconds = body['seconds']
         else: 
-            days = 7
-        print('Querying for ' + str(days) + ' days')
-        startdate = (unixEpoch - 60 * 60 * 24 * days) * 1000
+            seconds = 7 * 86400  # query for seven days if 'seconds' key is not present
+
+        print('Querying for ' + str(round(seconds/86400, 2)) + ' days'
+              + f' (or {round(seconds/60, 2)} minutes, or {seconds} seconds)')
+        startdate = (unixEpoch - seconds) * 1000
+
         data = '{"search": [{"ids": [\"%s\"]}]}' % ( "\",\"".join(body['ids']))
 
         iCloud_decryptionkey = retrieveICloudKey()
@@ -61,8 +64,8 @@ class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
         conn.request("POST", "/acsnservice/fetch", data, request_headers)
         res = conn.getresponse()
         result = json.loads(res.read())
-
         results = result["results"]
+        print(f'{len(results)} results received.')
 
         newResults = [] 
         latestEntry = None
@@ -75,7 +78,7 @@ class ServerHandler(six.moves.SimpleHTTPServer.SimpleHTTPRequestHandler):
             elif latestEntry["datePublished"] < entry["datePublished"]:
                 latestEntry = entry
 
-        if days < 1 and latestEntry is not None:
+        if seconds < 1 and latestEntry is not None:
             newResults.append(latestEntry)         
         result["results"] = newResults
         self.send_response(200)

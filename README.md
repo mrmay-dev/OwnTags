@@ -1,16 +1,19 @@
-# OwnTags
+# Ⓣ OwnTags
+![#f03c15](https://placehold.co/15x15/50bf54/50bf54.png) The purpose of this branch is to try using a proxy / client configurtion AND to implement using a TOML file for settings.
 
 I work on this for a little in the evenings after work, please bear with me as I complete the documentation. Thanks!
 
-> **Updated on May 10, 2023:** I'm not very good at managing a git. Good thing no one is making pull requests. I think I'd royally mess things up. I like this configuration. The work done over at headless-haystack can be tracked on the `headless-main` branch and the OwnTags-specific changes can continue on the main.
+> **Updated on May 25, 2023:** This branch now uses a TOML file for configuration. Hopefully, comments in the file make it self explanatory. Also, I'm hoping the directory structure reduces clutter and makes the project easier to look at.
 
 This project makes it possible to use [OwnTracks](https://owntracks.org/) apps ([Android](https://play.google.com/store/apps/details?id=org.owntracks.android), [iOS](https://itunes.apple.com/us/app/mqttitude/id692424691?mt=8) and [web](https://github.com/owntracks/frontend)) as the app for following and viewing Haystack tags.
 
 OwnTracks is well integrated into home automation projects like [Home Assistant](https://www.home-assistant.io/integrations/owntracks/) and [OpenHab](https://www.openhab.org/addons/bindings/gpstracker/). I can imagine some really cool things that could be done.
 
-![map displaying owntracks features like track lines, heatmaps and  regions](map-features.png "OwnTracks Map Features")
+This is a very new project and is under active development. I'm not the greatest programmer (something I picked up during COVID) so I learn as I go... meaning this thing could break at any moment for very silly reasons. That said, I am excited about it and hope a few others will join me to build something interesting. This work [builds the work of others](https://github.com/mrmay-dev/owntags/tree/dev-client#notes-of-gratitude).
 
-<!-- I'm going to use these in some screenshots.
+<!-- ![map displaying owntracks features like track lines, heatmaps and  regions](map-features.png "OwnTracks Map Features")
+
+I'm going to use these in some screenshots.
 Robots: 33.81411508658622, -117.9209239699076
 Light Saber: 33.814089694852186, -117.92266596079212
 Luke: 33.8141448100308, -117.92313412450245
@@ -18,21 +21,19 @@ X-Wing: 33.814162638077384, -117.92309657349315
 -->
 ## Installation 
 
-This is a very new project and is under active development. I'm not the greatest programmer (something I picked up during COVID) so I learn as I go... meaning this thing could break at any moment for very silly reasons. That said, I am totally excited about it and hope a few others will join me to build something interesting.
-
-### Requirements:
+To track tags with OwnTracks using this project you will need:
 
 1. MacOS Monterrey (v12) or higher. (This can be an actual Mac or a virtual one. Check out [Headless Haystack](https://github.com/dchristl/headless-haystack) for a complete solution.)
 
-2. A recent version of Python. [Homebrew](https://docs.brew.sh/Homebrew-and-Python) is probably the easiest way to get this.
+2. Python 3.7 or newer. [Homebrew](https://docs.brew.sh/Homebrew-and-Python) is probably the easiest way to get this.
 
-3. An MQTT broker. Homebrew is [the recommended way](https://mosquitto.org/download/#mac) to get this. Cloud MQTT brokers are available. Have a look at:
+3. An MQTT broker. Homebrew is [the recommended way](https://mosquitto.org/download/#mac) to get this. Cloud MQTT brokers are an interesting option. Have a look at:
      - [HiveMQ](https://www.hivemq.com/mqtt-cloud-broker/)
      - [MyQttHub](https://myqtthub.com/en)
      - [CloudMQTT](https://www.cloudmqtt.com/)
      - [fogwing](https://www.fogwing.io/)
 
-4. A *working* OwnTracks app. Before going any further stop here. *Make sure you have [OwnTracks up and running](https://owntracks.org/booklet/) before doing anything else!* Apps are availble for [Android](https://play.google.com/store/apps/details?id=org.owntracks.android) and [iOS](https://itunes.apple.com/us/app/mqttitude/id692424691?mt=8). The [web frontend](https://github.com/owntracks/frontend) has extra reqirements and additional, cool features but is very worth the effort *after* getting the apps to work.
+4. A *working* OwnTracks app. Before going any further stop here. *Make sure you have [OwnTracks up and running](https://owntracks.org/booklet/) before doing anything else!* Apps are availble for [Android](https://play.google.com/store/apps/details?id=org.owntracks.android) and [iOS](https://itunes.apple.com/us/app/mqttitude/id692424691?mt=8). The [web frontend](https://github.com/owntracks/frontend) has extra reqirements and additional, cool, features but is very worth the effort *after* getting the apps to work.
 
 
 ### Install
@@ -40,8 +41,7 @@ This is a very new project and is under active development. I'm not the greatest
 These instructions are based on a Homebrew installed Python with a locally hosted MQTT broker. Make changes to reflect your system. Python commands should work with regualar Python as well. If you are using Anaconda then you probably know how to do these things in a `conda` environment.
 
 **Download**
-
-- Download [the files](https://github.com/mrmay-dev/owntags/archive/refs/heads/main.zip) in this branch.
+- Download [the files](https://github.com/mrmay-dev/owntags/archive/refs/heads/dev-client.zip) in this branch.
 - Unzip and navigate to the folder in the terminal
 
 ```bash
@@ -49,70 +49,101 @@ cd /Users/lukeskywalker/Projects/owntags
 ```
 
 **Create a virtual environment for Python**
+
 ```bash
 python3 -m venv venv
 ```
 
 **Activate the environment**
 
-Deactivate it when done by closeing the terminal or typing `deactivate`.
+Deactivate it when done by closing the terminal or typing `deactivate`.
 
 ```bash
 source venv/bin/activate
 ```
 
+**Upgrade PIP & Install required libraries:**
+
+```bash
+pip install --upgrade pip
+pip install pyobjc cryptography six paho-mqtt  # tinydb, only if you want to export locations to this database
+``` 
+
 ### Configure
 
-Edit the `secrets.py` with your settings. There are notes in there to guide you. 
+You will need:
 
-Apple's FindMy location messages are encrypted on the tag and decrypted on the computer that receives them. To do that, the script needs your password so it can access the system keychain and decode location messages.
+* keyfiles of your tags
+    * Unfortunately, these tags can be used in nefarioius ways. So, it'll take some exploring to learn how to make them. These are good places to start: [OpenHaystack](https://github.com/seemoo-lab/openhaystack/tree/main/Firmware/ESP32#deploy-the-firmware) or [headless-haystack](https://github.com/dchristl/headless-haystack/tree/main/firmware/ESP32)
+* iTunes passoword (to decrypt location reports)
+* MQTT broker information
+* OwnTracks broker topics
 
-```python
-secrets = {
-    "password": "macOSpassowrd",  # your device's password to access keychain and decrypt messages.
+#### KeyFiles
+
+Create directory `applicaton/keys/` and put your keyfiles in there:
+
+```text
+owntags/
+└── application/
+    └── keys/
+        ├── prefix-1.keyfile
+        └── prefix-2.keyfile
 ```
 
-Optionally, the script can print location reports to the terminal. I like to see the latest, but listing all messages can be useful for debugging. 
+#### Settings
 
-```python
-    # == Console Printing
-    # positive numbers (4), the number of messages you want to see
+Add your iTunes password, MQTT broker details and OwnTracks topics to the `settings.toml` file.
+
+```toml
+[owntag_options]
+password = "password"  # macOS password
+print_history = 1
+    # positive numbers (4), the number of locations to print in the console
     # negative numbers (-1) will print all fetched locations,
     # 0 will turn printing fetched locations off
-    "print_history": 1,
+status_msg = false  # publish status and metadata to MQTT
+    # Status messages can be sent to an MQTT Topic
+status_base = "status/owntags"  # topic for status messages
+
+[mqtt_secrets]
+mqtt_broker = "your-broker.com"  # broker address
+mqtt_port = 1883  # 1883 if no TLS; 8883 if TLS
+mqtt_tls = "None"  # Comment out if using TLS
+mqtt_user = "username"  # Broker user
+mqtt_pass = "password"  # Broker password
+ # [mqtt_secrets.mqtt_tls]  # If TLS is activated, use this
+ # ca_certs = "output/isrgrootx1.cer"  # where the cert file located
+    # download HiveMQ certificate: https://community.hivemq.com/t/frequently-asked-questions/514
+    # create users at https://console.hivemq.com
+
+[owntracks_options]
+owntracks_device = "owntracks/user"  # Topic Base of your phone, used for waypoints
+owntags_base = nan  # topic Base for tags. If `nan` owntracks_devce will be used.
+
+[tag_options.prefix]
+location = true   # (not required) locations are seen by everyone with access to the topic (they act like users)
+waypoint = false  # (not required) waypoints are only seen on your phone (or device)
+timestamp = 1000000001   # (required for wayponts) Must be unique, can be any past Unix/Posix timestamp.
+radius = false    # (not required) use number for radius in meters, if `false` turn off, if `true` use confidence
+mqtt_topic = nan  # (not required)  topic for this tag, if `nan` owntags_base will be used
+status_topic = false    # (not required) if `True` messages will be published to `status_base`/prefix
+
 ```
 
-Console Messages can be sent to an MQTT Topic.
+### Run
+There are a couple of ways to start. The `owntags.sh` bash script will load the Python environment and fetch reports. Time is specified with `hh:mm` format. Plain double digits (`42`) will be interpreted as minutes.
 
-```
-    # == Status Messages
-    # Console Messages can be sent to an MQTT Topic
-    "status_msg": False,  # publish status and metadata
-    "status_base": "status/owntags",  # topic for status messages
+```bash
+./owntags.sh 0:30
 ```
 
-In OwnTracks, users can have multiple devices (phone, tablet, computer, etc), tags are just another device. Typically, you'll want tags to publish as your device. By [editing the MQTT ACLs](https://duckduckgo.com/?q=mqtt+acl&t=brave&ia=web) you can control topics that are visible to others, shared devices could be put on a shared topic.
+Optionally, drop into the `application` folder and start `request_reports.py` manually. `--owntags` tells the script to send locations to OwnTracks:
 
-```python
-    # == Owntracks Options
-    "owntracks_device": "owntracks/richard",  # user Topic Base of your phone, used for waypoints
-    "owntags_base": None,  # topic base for tags. If `None` owntracks_devcies will be used.
-```    
-
-Each device must have its own configuration. To do that, duplicate this key for each device and **change `tag_prefix`** to your tag's prefix and the **`"tst"` value to a unique Unix timestamp**.
-
-```python 
-    # == Device options
-    "tag_prefix": {  # this is the prefix of your tag.
-        "tst": 1000000001,  # this can be any past Unix/Posix timestamp
-        "waypoint": False,  # Waypoints are only seen on your phone (or device)
-        "location": True,  # locations are seen by everyone with access to the topic (they act like users)
-        "status": False,  # if `True` messages will be published to `status_base`/prefix
-        "mqtt_topic": None,  # topic for this tag, if `None` owntags_base will be used
-    },
-}
+```bash
+cd application
+request_reports.py --time 0:60 --owntags
 ```
-
 
 [Sorry all, this all I had time for tonight. I add a little each day after work.]
  
@@ -129,5 +160,3 @@ None of this would be possible without building on the work of many others who a
 - **[Headless Haystack](https://github.com/dchristl/headless-haystack):** who assembled, and is refining, the various parts to create an integrated solution that simplifies managing devices that leverage Apples' FindMy RTLS.
 
 OwnTags builds directly on the work of [@dchristl](https://github.com/dchristl) in Headless Haystack. I've humbly taken that code, cleaned it up a bit, and added what is needed to forward locaton reports to an OwnTracks system.
-
- 
