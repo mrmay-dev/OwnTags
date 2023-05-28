@@ -125,9 +125,13 @@ notes
 *.pyc
 
 firmware/
+
 update.sh
+
 venv/
+
 required.sh
-scratch/
-mysecrets.py
-keys/
+*.keys
+*.cer
+tinydb
+scratch
