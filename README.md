@@ -49,11 +49,13 @@ cd /Users/lukeskywalker/Projects/owntags
 ```
 
 **Create a virtual environment for Python**
+
 ```bash
 python3 -m venv venv
 ```
 
 **Activate the environment**
+
 Deactivate it when done by closing the terminal or typing `deactivate`.
 
 ```bash
@@ -61,6 +63,7 @@ source venv/bin/activate
 ```
 
 **Upgrade PIP & Install required libraries:**
+
 ```bash
 pip install --upgrade pip
 pip install pyobjc cryptography six paho-mqtt requests  # tinydb, only if you want to export locations to this database
