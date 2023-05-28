@@ -9,8 +9,7 @@ This project makes it possible to use [OwnTracks](https://owntracks.org/) apps (
 
 OwnTracks is well integrated into home automation projects like [Home Assistant](https://www.home-assistant.io/integrations/owntracks/) and [OpenHab](https://www.openhab.org/addons/bindings/gpstracker/). I can imagine some really cool things that could be done.
 
-These instructions are based on a Homebrew installed Python with a locally hosted MQTT broker. Make changes to reflect your system. Python commands should work with regualar Python as well. If you are using Anaconda then you probably know how to do these things in a `conda` environment.
-
+This is a very new project and is under active development. I'm not the greatest programmer (something I picked up during COVID) so I learn as I go... meaning this thing could break at any moment for very silly reasons. That said, I am excited about it and hope a few others will join me to build something interesting. This work [builds the work of others](https://github.com/mrmay-dev/owntags/tree/dev-client#notes-of-gratitude).
 
 <!-- ![map displaying owntracks features like track lines, heatmaps and  regions](map-features.png "OwnTracks Map Features")
 
@@ -22,9 +21,7 @@ X-Wing: 33.814162638077384, -117.92309657349315
 -->
 ## Installation 
 
-This is a very new project and is under active development. I'm not the greatest programmer (something I picked up during COVID) so I learn as I go... meaning this thing could break at any moment for very silly reasons. That said, I am excited about it and hope a few others will join me to build something interesting. This work [builds the work of others](https://github.com/mrmay-dev/owntags/tree/dev-client#notes-of-gratitude).
-
-### Requirements:
+To use track tags with OwnTracks using this project you will need:
 
 1. MacOS Monterrey (v12) or higher. (This can be an actual Mac or a virtual one. Check out [Headless Haystack](https://github.com/dchristl/headless-haystack) for a complete solution.)
 
@@ -40,6 +37,8 @@ This is a very new project and is under active development. I'm not the greatest
 
 
 ### Install
+
+These instructions are based on a Homebrew installed Python with a locally hosted MQTT broker. Make changes to reflect your system. Python commands should work with regualar Python as well. If you are using Anaconda then you probably know how to do these things in a `conda` environment.
 
 **Download**
 - Download [the files](https://github.com/mrmay-dev/owntags/archive/refs/heads/dev-client.zip) in this branch.
