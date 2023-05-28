@@ -1,12 +1,18 @@
 # Ⓣ OwnTags
-
-I work on this for a little in the evenings after work, please bear with me as I complete the documentation. Thanks!
-
-> **Updated on May 25, 2023:** This branch now uses a TOML file for configuration. Hopefully, comments in the file make it self explanatory. Also, I'm hoping the directory structure reduces clutter and makes the project easier to look at.
+I work on this for a little in the evenings after work. Thanks for visiting!
 
 This project makes it possible to use [OwnTracks](https://owntracks.org/) apps ([Android](https://play.google.com/store/apps/details?id=org.owntracks.android), [iOS](https://itunes.apple.com/us/app/mqttitude/id692424691?mt=8) and [web](https://github.com/owntracks/frontend)) as the app for following and viewing Haystack tags.
 
 OwnTracks is well integrated into home automation projects like [Home Assistant](https://www.home-assistant.io/integrations/owntracks/) and [OpenHab](https://www.openhab.org/addons/bindings/gpstracker/). I can imagine some really cool things that could be done.
+
+**Updated on May 27, 2023:** 
+
+* introduced settings TOML file for configuration. Hopefully, comments in the file make it self explanatory. 
+* simplified directory structure to reduce clutter and makes the project easier to look at.
+* timeframe to retreive location reports is done with `--time hh:mm` flag
+* location reports can be stored to [TinyDB](https://tinydb.readthedocs.io/en/latest/index.html), this will change to [tinyfluxDB](https://tinyflux.readthedocs.io/en/latest/intro.html) soon.
+* tweaked terminal output
+
 
 This is a very new project and is under active development. I'm not the greatest programmer (something I picked up during COVID) so I learn as I go... meaning this thing could break at any moment for very silly reasons. That said, I am excited about it and hope a few others will join me to build something interesting. This work [builds the work of others](https://github.com/mrmay-dev/owntags/tree/dev-client#notes-of-gratitude).
 
@@ -33,7 +39,6 @@ To track tags with OwnTracks using this project you will need:
      - [fogwing](https://www.fogwing.io/)
 
 4. A *working* OwnTracks app. Before going any further stop here. *Make sure you have [OwnTracks up and running](https://owntracks.org/booklet/) before doing anything else!* Apps are availble for [Android](https://play.google.com/store/apps/details?id=org.owntracks.android) and [iOS](https://itunes.apple.com/us/app/mqttitude/id692424691?mt=8). The [web frontend](https://github.com/owntracks/frontend) has extra reqirements and additional, cool, features but is very worth the effort *after* getting the apps to work.
-
 
 ### Install
 
