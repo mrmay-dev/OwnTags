@@ -1,0 +1,8 @@
+# This project requires the following libraries
+# python -m pip install -c constraints.txt
+pyobjc
+cryptography
+six
+paho-mqtt
+# requests
+# tinydb
