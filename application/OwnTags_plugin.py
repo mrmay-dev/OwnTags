@@ -46,6 +46,8 @@ def owntags(ordered, time_window, found_keys):
     broker_user = mqtt_secrets["mqtt_user"]
     broker_pass = mqtt_secrets["mqtt_pass"]
     broker_tls = mqtt_secrets["mqtt_tls"]
+    if broker_tls == "None":
+        broker_tls = None
 
     # OwnTag Options
     print_history = owntag_options["print_history"]
