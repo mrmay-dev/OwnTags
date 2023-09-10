@@ -122,9 +122,18 @@ mqtt_pass = "password"  # Broker password
     # create users at https://console.hivemq.com
 
 [owntracks_options]
-owntracks_device = "owntracks/user"  # Topic Base of your phone, used for waypoints
+# The script publishes waypoints to a user's topic, which makes the tags act like they are owned
+# by the user. It is possible to publish tags to other topics. Read the OwnTracks booklet
+# for more: https://owntracks.org/booklet/guide/topics/
+owntracks_device = "owntracks/iphone"  # Topic Base of your phone, used for publishing waypoints. 
 owntags_base = nan  # topic Base for tags. If `nan` owntracks_devce will be used.
 
+
+# Each tag has its own options. When published to OwnTracks they can behave as `locations` or as `waypoints`.
+# Learn about locations here: https://owntracks.org/booklet/features/location/
+# Learn about waypoints here: https://owntracks.org/booklet/guide/waypoints/
+# OwnTracks identifies `waypoints` by their creation timestamp. Here, you assign the timestamp manually to
+# ensure it is unique.
 [tag_options.prefix]
 location = true   # (not required) locations are seen by everyone with access to the topic (they act like users)
 waypoint = false  # (not required) waypoints are only seen on your phone (or device)
