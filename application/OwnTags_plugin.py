@@ -6,20 +6,21 @@ import time
 import datetime
 import paho.mqtt.publish as publish
 import sys
+import tomli as toml
 
 
 def get_configuration():
-    """ Check Python version and decide how to handle TOML
-    """
-    py_major, py_minor, py_micro, py_release, serial = sys.version_info
-    version = float(f'{py_major}.{py_minor}')
-    if version >= 3.11:
-        import tomllib as toml
-    elif version >= 3.7:
-        import tomli as toml
-    elif version < 3.7:
-        print(f'Found Python {version}.\nUpgrade to python 3.7 or higher')
-        exit()
+#    """ Check Python version and decide how to handle TOML
+#    """
+#    py_major, py_minor, py_micro, py_release, serial = sys.version_info
+#    version = float(f'{py_major}.{py_minor}')
+#    if version >= 3.11:
+#        import tomllib as toml
+#    elif version >= 3.7:
+#        import tomli as toml
+#    elif version < 3.7:
+#        print(f'Found Python {version}.\nUpgrade to python 3.7 or higher')
+#        exit()
 
     with open('../settings.toml', mode='rb') as fp:
         configuration = toml.load(fp)

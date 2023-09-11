@@ -10,6 +10,8 @@ print_history = 1
 status_msg = false  # publish status and metadata
     # Status messages can be sent to an MQTT Topic
 status_base = "status/owntags"  # topic for status messages
+output_folder = "keys/"
+
 
 [mqtt_secrets]
 mqtt_broker = "your-broker.com"  # broker address
