@@ -18,9 +18,9 @@ def get_configuration():
     elif version >= 3.7:
         import tomli as toml
     elif version < 3.7:
-        print(f'Found Python {version}.\nUpgrade to python 3.7 or higher')
+        print(f'Found Python {version}.\nPlease upgrade to python 3.7 or higher')
         exit()
-
+        
     with open('../settings.toml', mode='rb') as fp:
         configuration = toml.load(fp)
 
@@ -102,11 +102,12 @@ def owntags(ordered, time_window, found_keys):
         latitude = key_list[last_report_num]["lat"]
         longitude = key_list[last_report_num]["lon"]
         confidence = key_list[last_report_num]["conf"]  # is this feet, signal strength or something else?
-        meters = round(confidence * .3048)  # feet to meters seems reasonable
+        meters = round(confidence * .3048)  # Not sure what confidence actually indicates. Feet to meters seems reasonable.
         timestamp = key_list[last_report_num]["timestamp"]
         prefix = key_list[last_report_num]["key"]
 
-        # TODO waypoint timestamps
+        # TODO waypoint timestamps.
+        # Raise error if there is a duplicated stamp or a key is missing one.
         try:
             creation_stamp = tag_options[prefix]["timestamp"]
         except KeyError as e:
