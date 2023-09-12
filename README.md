@@ -1,4 +1,7 @@
+**Latest Update:** Monday, September 11, 2023
+
 # Ⓣ OwnTags
+
 I work on this for a little in the evenings after work. Thanks for visiting!
 
 This project makes it possible to use [OwnTracks](https://owntracks.org/) apps ([Android](https://play.google.com/store/apps/details?id=org.owntracks.android), [iOS](https://itunes.apple.com/us/app/mqttitude/id692424691?mt=8) and [web](https://github.com/owntracks/frontend)) as the app for following and viewing Haystack tags.
@@ -100,48 +103,51 @@ owntags/
 Add your iTunes password, MQTT broker details and OwnTracks topics to the `settings.toml` file.
 
 ```toml
+# -- INSTRUCTIONS --
+# Make a copy of this file and rename it settings.toml.
+# add information about your system, MQTT broker, OwnTracks setup.
+# Create a new settings block for each tag. 
+
 [owntag_options]
 password = "password"  # macOS password
 print_history = 1
-    # positive numbers (4), the number of locations to print in the console
-    # negative numbers (-1) will print all fetched locations,
-    # 0 will turn printing fetched locations off
-status_msg = false  # publish status and metadata to MQTT
-    # Status messages can be sent to an MQTT Topic
+# positive numbers (4), the number of messages you want to see
+# negative numbers (-1) will print all fetched locations,
+# 0 will turn printing fetched locations off
+status_msg = false  # publish status and metadata
+# Status messages can be sent to an MQTT Topic
 status_base = "status/owntags"  # topic for status messages
 
 [mqtt_secrets]
-mqtt_broker = "your-broker.com"  # broker address
+mqtt_broker = "broker address "  # broker address
 mqtt_port = 1883  # 1883 if no TLS; 8883 if TLS
-mqtt_tls = "None"  # Comment out if using TLS
 mqtt_user = "username"  # Broker user
 mqtt_pass = "password"  # Broker password
- # [mqtt_secrets.mqtt_tls]  # If TLS is activated, use this
- # ca_certs = "output/isrgrootx1.cer"  # where the cert file located
-    # download HiveMQ certificate: https://community.hivemq.com/t/frequently-asked-questions/514
-    # create users at https://console.hivemq.com
+# MQTT options for using TLS. No changes needed if your server is not using TLS.
+mqtt_tls = "None"  # To use TLS comment out this line by putting a '#' in front of it.
+# Uncomment these lines and adjust to your needs
+# [mqtt_secrets.mqtt_tls]
+# ca_certs = "keys/isrgrootx1.cer"  # cert location, the 'keys' folder is a good place
+# download HiveMQ certificate: https://community.hivemq.com/t/frequently-asked-questions/514
+# create users at https://console.hivemq.com
 
 [owntracks_options]
-# The script publishes waypoints to a user's topic, which makes the tags act like they are owned
-# by the user. It is possible to publish tags to other topics. Read the OwnTracks booklet
-# for more: https://owntracks.org/booklet/guide/topics/
-owntracks_device = "owntracks/iphone"  # Topic Base of your phone, used for publishing waypoints. 
-owntags_base = nan  # topic Base for tags. If `nan` owntracks_devce will be used.
+owntracks_device = "owntracks/phone"  # user Topic Base of your phone or device with owntracks, used for waypoints
+owntags_base = nan  # topic base for tags. If `nan` owntracks_device will be used.
 
-
-# Each tag has its own options. When published to OwnTracks they can behave as `locations` or as `waypoints`.
-# Learn about locations here: https://owntracks.org/booklet/features/location/
-# Learn about waypoints here: https://owntracks.org/booklet/guide/waypoints/
-# OwnTracks identifies `waypoints` by their creation timestamp. Here, you assign the timestamp manually to
-# ensure it is unique.
+# Each tag can be configured to appear as 'waypoints' on your device only, or as 'locations' that are shared
+# with other users. 'locations' are easier to start with.
+# OwnTags can share the tag as both, odd things will happen and be prepared for some challenges.
 [tag_options.prefix]
+tag_name = "prefix"  # the prefix of your key
 location = true   # (not required) locations are seen by everyone with access to the topic (they act like users)
 waypoint = false  # (not required) waypoints are only seen on your phone (or device)
 timestamp = 1000000001   # (required for wayponts) Must be unique, can be any past Unix/Posix timestamp.
 radius = false    # (not required) use number for radius in meters, if `false` turn off, if `true` use confidence
+# Advance Features
+tag_image = nan  # base 64 encoded, 200x200, PNG or JPEG image
 mqtt_topic = nan  # (not required)  topic for this tag, if `nan` owntags_base will be used
 status_topic = false    # (not required) if `True` messages will be published to `status_base`/prefix
-
 ```
 
 ### Run
