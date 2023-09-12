@@ -15,7 +15,8 @@ from OwnTags_plugin import get_configuration
 
 # Get configuration
 configuration = get_configuration()
-OUTPUT_FOLDER = configuration["owntag_options"]["output_folder"]
+# OUTPUT_FOLDER = configuration["owntag_options"]["keys_folder"]
+OUTPUT_FOLDER = "keys/"
 
 start_script = '{:%Y %b %d (%a) %H:%M:%S}'.format(datetime.datetime.now())
 print(f'{start_script}')
@@ -118,8 +119,7 @@ if __name__ == "__main__":
     if response.status == 500:
         print(f'''
         HELP: This error is generally happens when something is wrong with the request.
-        Usually, no keys were requested.  Check the `output_folder` in `settings.toml`,
-        is there a trailing `/` in the folder name?
+        Usually no keys were requested, meaning the keys folder is probably empty. 
         ''')
         raise Exception(response_status)
     res = json.loads(response.read())['results']
