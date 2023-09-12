@@ -169,7 +169,7 @@ request_reports.py --time 0:60 --owntags
 
 The number of items to display can be controlled in the `print_history` line of the settings.toml.
 
-[Resulting sript output screenshot with location information blocked out. The images displays a JSON object containing metadata and location data about a tag named with the prefix 'steve'.](output.jpeg)
+![Resulting sript output screenshot with location information blocked out. The images displays a JSON object containing metadata and location data about a tag named with the prefix 'steve'.](output.jpeg)
  
 ## Notes of Gratitude
 
