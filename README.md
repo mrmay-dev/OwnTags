@@ -96,7 +96,7 @@ owntags/
 
 #### Settings
 
-Add your Apple/iTunes password, MQTT broker details and OwnTracks topics to the `settings.toml` file.
+Add your macOS/computer password, MQTT broker details and OwnTracks topics to the `settings.toml` file.
 
 Additionally, create a `[tag_options.prefix]` block for each of your keys. Notably, each key should have:
 
@@ -110,7 +110,7 @@ Additionally, create a `[tag_options.prefix]` block for each of your keys. Notab
 # Create a new settings block for each tag. 
 
 [owntag_options]
-password = "password"  # macOS/iTunes password
+password = "password"  # macOS/computer password
 print_history = 1  # number of items to display in the terminal
 # positive numbers (4), the number of messages you want to see
 # negative numbers (-1) will print all fetched locations,
