@@ -160,8 +160,6 @@ There are a couple of ways to start. The `owntags.sh` bash script will load the 
 
 Optionally, drop into the `application` folder and start `request_reports.py` manually. `--owntags` tells the script to send locations to OwnTracks:
 
-The output will look something like this. This output can be 
-
 ```bash
 cd application
 request_reports.py --time 0:60 --owntags
