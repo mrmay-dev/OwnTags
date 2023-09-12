@@ -5,7 +5,7 @@
 # Create a new settings block for each tag. 
 
 [owntag_options]
-password = "password"  # macOS password
+password = "password"  # macOS/computer password
 print_history = 1
     # positive numbers (4), the number of messages you want to see
     # negative numbers (-1) will print all fetched locations,
