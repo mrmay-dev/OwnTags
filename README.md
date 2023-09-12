@@ -8,14 +8,10 @@ This project makes it possible to use [OwnTracks](https://owntracks.org/) apps (
 
 OwnTracks is well integrated into home automation projects like [Home Assistant](https://www.home-assistant.io/integrations/owntracks/) and [OpenHab](https://www.openhab.org/addons/bindings/gpstracker/). I can imagine some really cool things that could be done.
 
-**Updated on May 27, 2023:** 
+**Updated on September 11, 2023:** 
 
-* introduced settings TOML file for configuration. Hopefully, comments in the file make it self explanatory. 
-* simplified directory structure to reduce clutter and makes the project easier to look at.
-* timeframe to retreive location reports is done with `--time hh:mm` flag
-* location reports can be stored to [TinyDB](https://tinydb.readthedocs.io/en/latest/index.html), this will change to [tinyfluxDB](https://tinyflux.readthedocs.io/en/latest/intro.html) soon.
-* tweaked terminal output
-
+* added comments to the 'settings-template.toml'
+* hard-coded the .keyfile folder location
 
 This is a very new project and is under active development. I'm not the greatest programmer (something I picked up during COVID) so I learn as I go... meaning this thing could break at any moment for very silly reasons. That said, I am excited about it and hope a few others will join me to build something interesting. This work [builds the work of others](https://github.com/mrmay-dev/owntags/tree/dev-client#notes-of-gratitude).
 
@@ -88,7 +84,7 @@ You will need:
 
 #### KeyFiles
 
-Create directory `applicaton/keys/` and put your keyfiles in there:
+Put your keyfiles in `applicaton/keys/`:
 
 ```text
 owntags/
@@ -100,7 +96,12 @@ owntags/
 
 #### Settings
 
-Add your iTunes password, MQTT broker details and OwnTracks topics to the `settings.toml` file.
+Add your Apple/iTunes password, MQTT broker details and OwnTracks topics to the `settings.toml` file.
+
+Additionally, create a `[tag_options.prefix]` block for each of your keys. Notably, each key should have:
+
+- a unique prefix name for each. This prefix goes in the block title (`[tag_options.prefix name here]`) AND `tag_name = "prefix name here"`.
+- assign a unique `timestamp` for each key. It should be any Unix/Posix date in the past. Using numbers starting '1000000001' is convenient.
 
 ```toml
 # -- INSTRUCTIONS --
@@ -109,12 +110,12 @@ Add your iTunes password, MQTT broker details and OwnTracks topics to the `setti
 # Create a new settings block for each tag. 
 
 [owntag_options]
-password = "password"  # macOS password
-print_history = 1
+password = "password"  # macOS/iTunes password
+print_history = 1  # number of items to display in the terminal
 # positive numbers (4), the number of messages you want to see
 # negative numbers (-1) will print all fetched locations,
 # 0 will turn printing fetched locations off
-status_msg = false  # publish status and metadata
+status_msg = false  # publish status and metadata to MQTT
 # Status messages can be sent to an MQTT Topic
 status_base = "status/owntags"  # topic for status messages
 
@@ -159,12 +160,16 @@ There are a couple of ways to start. The `owntags.sh` bash script will load the 
 
 Optionally, drop into the `application` folder and start `request_reports.py` manually. `--owntags` tells the script to send locations to OwnTracks:
 
+The output will look something like this. This output can be 
+
 ```bash
 cd application
 request_reports.py --time 0:60 --owntags
 ```
 
-[Sorry all, this all I had time for tonight. I add a little each day after work.]
+The number of items to display can be controlled in the `print_history` line of the settings.toml.
+
+[Resulting sript output screenshot with location information blocked out. The images displays a JSON object containing metadata and location data about a tag named with the prefix 'steve'.](output.jpeg)
  
 ## Notes of Gratitude
 
