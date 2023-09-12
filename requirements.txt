@@ -4,5 +4,4 @@ pyobjc
 cryptography
 six
 paho-mqtt
-# requests
 # tinydb
