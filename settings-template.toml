@@ -5,7 +5,7 @@
 # Create a new settings block for each tag. 
 
 [owntag_options]
-password = "password"  # macOS password. Used to decrypt location reports.
+password = "password"  # macOS password
 print_history = 1
     # positive numbers (4), the number of messages you want to see
     # negative numbers (-1) will print all fetched locations,
@@ -15,26 +15,32 @@ status_msg = false  # publish status and metadata
 status_base = "status/owntags"  # topic for status messages
 
 [mqtt_secrets]
-mqtt_broker = "your-broker.com"  # broker address
+mqtt_broker = "broker address "  # broker address
 mqtt_port = 1883  # 1883 if no TLS; 8883 if TLS
-mqtt_tls = nan  # Comment out if using TLS. Uncomment below to use certificates.
 mqtt_user = "username"  # Broker user
 mqtt_pass = "password"  # Broker password
-# [mqtt_secrets.mqtt_tls]  # If TLS is activated, use this
-# ca_certs = "keys/isrgrootx1.cer"  # where the cert file located
+# MQTT options for using TLS. No changes needed if your server is not using TLS.
+mqtt_tls = "None"  # To use TLS comment out this line by putting a '#' in front of it.
+# Uncomment these lines and adjust to your needs
+# [mqtt_secrets.mqtt_tls]
+# ca_certs = "keys/isrgrootx1.cer"  # cert location, the 'keys' folder is a good place
     # download HiveMQ certificate: https://community.hivemq.com/t/frequently-asked-questions/514
     # create users at https://console.hivemq.com
 
 [owntracks_options]
-owntracks_device = "owntracks/user"  # Topic Base of your phone, used for waypoints
-owntags_base = nan  # topic Base for tags. If `nan` owntracks_devce will be used.
+owntracks_device = "owntracks/phone"  # user Topic Base of your phone or device with owntracks, used for waypoints
+owntags_base = nan  # topic base for tags. If `nan` owntracks_device will be used.
 
-# Locations are published as retained, this allows clients to get the most recent
-# report at any time. Waypoints are intended to be published *without* retain.
-[tag_options.prefix]  # Change 'prefix' to match your tag.
+# Each tag can be configured to appear as 'waypoints' on your device only, or as 'locations' that are shared
+# with other users. 'locations' are easier to start with.
+# OwnTags can share the tag as both, odd things will happen and be prepared for some challenges.
+[tag_options.prefix]
+tag_name = "prefix"  # the prefix of your key
 location = true   # (not required) locations are seen by everyone with access to the topic (they act like users)
 waypoint = false  # (not required) waypoints are only seen on your phone (or device)
 timestamp = 1000000001   # (required for wayponts) Must be unique, can be any past Unix/Posix timestamp.
 radius = false    # (not required) use number for radius in meters, if `false` turn off, if `true` use confidence
+# Advance Features
+tag_image = nan  # base 64 encoded, 200x200, PNG or JPEG image
 mqtt_topic = nan  # (not required)  topic for this tag, if `nan` owntags_base will be used
 status_topic = false    # (not required) if `True` messages will be published to `status_base`/prefix
